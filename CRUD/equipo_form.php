@@ -30,8 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($stmt->execute()) {
            
             $serial = $serie;
+            $urlqr = "/CRUD/dashboard.php?q=".urlencode($serial);
             $ruta = 'qrs/qr_'.$serial.'.png';
-            generalQR($serial, $ruta, 4);
+            generalQR($urlqr, $ruta, 4);
         header("Location: ver_qr.php?serie=" . urlencode($serial));
           exit;
            
