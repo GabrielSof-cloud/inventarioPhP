@@ -78,6 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <label>Observaciones</label>
 <textarea name="observaciones"></textarea>
 <button type="submit">Guardar</button>
+<a href="dashboard.php">Cancelar</a>
 </form>
 </div>
 </body>

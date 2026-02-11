@@ -8,7 +8,7 @@ require_once $_SERVER['DOCUMENT_ROOT'].'/DBconn/conexion.php';
 // VALIDAR ID
 // ===============================
 if (!isset($_GET['id']) && !isset($_POST['id'])) {
-    header("Location: dashboard.php");
+    header("Location: Descartado.php");
     exit;
 }
 
@@ -20,12 +20,12 @@ $id = $_GET['id'] ?? $_POST['id'];
 // ===============================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmar'])) {
 
-    $sqlDelete = "DELETE FROM equipos WHERE id = ?";
+    $sqlDelete = "DELETE FROM descarto WHERE id = ?";
     $stmtDelete = $conn->prepare($sqlDelete);
     $stmtDelete->bind_param("i", $id);
 
     if ($stmtDelete->execute()) {
-        header("Location: dashboard.php");
+        header("Location: Descartado.php");
         exit;
     } else {
         $error = "❌ Error al eliminar el registro";
@@ -35,14 +35,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmar'])) {
 // ===============================
 // OBTENER REGISTRO PARA MOSTRAR
 // ===============================
-$sql = "SELECT * FROM equipos WHERE id = ?";
+$sql = "SELECT * FROM descarto WHERE id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id);
 $stmt->execute();
 $resultado = $stmt->get_result();
 
 if ($resultado->num_rows === 0) {
-    header("Location: dashboard.php");
+    header("Location: Descartado.php");
     exit;
 }
 
@@ -61,17 +61,20 @@ $equipo = $resultado->fetch_assoc();
 
 <!-- TABLA CON EL REGISTRO -->
 <table>
-    <tr>
-        <th>ID</th>
-        <th>Serie</th>
-        <th>Modelo</th>
-        <th>Usuario</th>
-        <th>Departamento</th>
-        <th>Ubicación</th>
-        <th>Observaciones</th>
-    </tr>
-    <tr>
-        <tbody>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Serie</th>
+            <th>Modelo</th>
+            <th>Usuario</th>
+            <th>Departamento</th>
+            <th>Ubicación</th>
+            <th>Observaciones</th>
+            <th>Fecha Descarte</th>
+            <th>Motivo</th>
+        </tr>
+    </thead>
+    <tbody>
         <tr>
             <td><?php echo $equipo['id']; ?></td>
             <td><?php echo htmlspecialchars($equipo['serie']); ?></td>
@@ -80,11 +83,12 @@ $equipo = $resultado->fetch_assoc();
             <td><?php echo htmlspecialchars($equipo['departamento']); ?></td>
             <td><?php echo htmlspecialchars($equipo['ubicacion']); ?></td>
             <td><?php echo htmlspecialchars($equipo['observaciones']); ?></td>
+            <td><?php echo htmlspecialchars($equipo['fecha_descarto']); ?></td>
+            <td><?php echo htmlspecialchars($equipo['motivo']); ?></td>
         </tr>
     </tbody>
 </table>
-    </tr>
-</table>
+
 
 <!-- MENSAJE DE ADVERTENCIA -->
 <h1>⚠️ ¿Seguro que quieres borrarlo?</h1>
@@ -93,7 +97,7 @@ $equipo = $resultado->fetch_assoc();
 <form method="POST" action="">
     <input type="hidden" name="id" value="<?php echo $equipo['id']; ?>">
     <button type="submit" name="confirmar">Continuar</button>
-    <a href="dashboard.php">Cancelar</a>
+    <a href="Descartado.php">Cancelar</a>
 </form>
 
 <?php

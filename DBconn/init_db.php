@@ -27,6 +27,21 @@ CREATE TABLE IF NOT EXISTS equipos (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ");
 
+// Crear tabla descarto
+$conn->query("
+CREATE TABLE IF NOT EXISTS descarto (
+    id INT PRIMARY KEY,
+    serie VARCHAR(150) UNIQUE,
+    modelo VARCHAR(150),
+    usuario VARCHAR(150),
+    departamento VARCHAR(150),
+    ubicacion VARCHAR(255),
+    observaciones TEXT,
+    fecha_descarto DATETIME DEFAULT CURRENT_TIMESTAMP,
+    motivo TEXT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+");
+
 // Crear admin si no existe
 $stmt = $conn->prepare("SELECT id FROM usuarios WHERE email = ?");
 $email = 'smailinsantos9@gmail.com';
