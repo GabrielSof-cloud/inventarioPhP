@@ -57,6 +57,9 @@ if ($q !== '') {
 <th>Usuario</th>
 <th>Departamento</th>
 <th>Ubicación</th>
+<th>Descartar</th>
+<th>Editar</th>
+<th>Eliminar</th>
 </tr>
 </thead>
 <tbody>
@@ -71,6 +74,9 @@ if ($q !== '') {
 <td><?php echo htmlspecialchars($r['usuario']); ?></td>
 <td><?php echo htmlspecialchars($r['departamento']); ?></td>
 <td><?php echo htmlspecialchars($r['ubicacion']); ?></td>
+<td><a href="Descartado.php?id=<?php echo (int)$r['id']; ?>">Descartar</a></td>
+<td><a href="edit_equipo.php?id=<?php echo (int)$r['id']; ?>">Editar</a></td>
+<td><a href="delete_equipo.php?id=<?php echo (int)$r['id']; ?>">Eliminar</a></td>
 </tr>
 <?php endforeach; ?>
 <?php endif; ?>
@@ -79,3 +85,4 @@ if ($q !== '') {
 </div>
 </body>
 </html>
+    
