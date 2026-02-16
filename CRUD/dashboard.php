@@ -44,7 +44,7 @@ if ($q !== '') {
 <form method="get" action="dashboard.php" class="search-form">
 <input type="text" name="q" placeholder="Buscar..." value="<?php echo htmlspecialchars($q); ?>">
 <button type="submit">Buscar</button>
-<a href="equipo_form.php" class="btn">Agregar equipo</a>
+<a href="create_form.php" class="btn">Agregar equipo</a>
 <a href="Descartado.php" class="btn">descartados</a>
 <a href="movidos.php" class="btn">trazacion de equipos</a>
 </form>
