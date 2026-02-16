@@ -46,6 +46,7 @@ if ($q !== '') {
 <button type="submit">Buscar</button>
 <a href="equipo_form.php" class="btn">Agregar equipo</a>
 <a href="Descartado.php" class="btn">descartados</a>
+<a href="movidos.php" class="btn">trazacion de equipos</a>
 </form>
 
 <table class="table">
@@ -57,6 +58,7 @@ if ($q !== '') {
 <th>Usuario</th>
 <th>Departamento</th>
 <th>Ubicación</th>
+<th></th>
 <th></th>
 <th></th>
 </tr>
@@ -75,6 +77,7 @@ if ($q !== '') {
 <td><?php echo htmlspecialchars($r['ubicacion']); ?></td>
 <td><a href="confirmar_descarto.php?id=<?php echo (int)$r['id']; ?>">Descartar</a></td>
 <td><a href="edit_equipo.php?id=<?php echo (int)$r['id']; ?>">Editar</a></td>
+<td><a href="mover.php?id=<?php echo (int)$r['id']; ?>">Mover</a></td>
 </tr>
 <?php endforeach; ?>
 <?php endif; ?>

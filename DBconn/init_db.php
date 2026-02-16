@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(150) NOT NULL,
     email VARCHAR(200) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
     activo TINYINT DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -39,6 +39,22 @@ CREATE TABLE IF NOT EXISTS descarto (
     observaciones TEXT,
     fecha_descarto DATETIME DEFAULT CURRENT_TIMESTAMP,
     motivo TEXT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+");
+
+// Crear tabla movimientos
+$conn->query("
+CREATE TABLE IF NOT EXISTS movimientos (
+    id_movimiento INT AUTO_INCREMENT PRIMARY KEY,
+    id_equipo INT,
+    serie VARCHAR(150),
+    modelo VARCHAR(150),
+    usuario VARCHAR(150),
+    departamento VARCHAR(150),
+    ubicacion VARCHAR(255),
+    observaciones TEXT,
+    fecha_movimiento DATETIME DEFAULT CURRENT_TIMESTAMP,
+    tipo_movimiento VARCHAR(50)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ");
 
