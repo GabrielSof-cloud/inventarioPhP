@@ -1,0 +1,196 @@
+/* =========================================
+   VAULT - Sistema de Inventario UI
+   ========================================= */
+
+:root {
+    --primary-blue: #004B87;
+    --accent-blue: #007BFF;
+    --accent-hover: #0056b3;
+    --bg-light: #F4F7F6;
+    --white: #FFFFFF;
+    --text-dark: #2C3E50;
+    --text-muted: #8C98A4;
+    --border-color: #E1E8ED;
+    --danger-red: #DC3545; /* Para botones de eliminar */
+    --success-green: #28A745; /* Para confirmaciones */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+
+/* --- Layout Principal --- */
+.vault-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* --- Sidebar / Menú Lateral --- */
+.vault-sidebar {
+    width: 250px;
+    background-color: var(--primary-blue);
+    color: var(--white);
+    padding: 20px 0;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+
+.vault-sidebar h2 {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 30px;
+    letter-spacing: 2px;
+}
+
+.vault-sidebar ul {
+    list-style: none;
+}
+
+.vault-sidebar ul li a {
+    display: block;
+    color: var(--white);
+    text-decoration: none;
+    padding: 15px 25px;
+    transition: 0.3s ease;
+}
+
+.vault-sidebar ul li a:hover {
+    background-color: var(--accent-blue);
+    border-left: 4px solid var(--white);
+}
+
+/* --- Contenido Principal --- */
+.vault-main {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+}
+
+.vault-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+/* --- Tarjetas (Cards) para Formularios o Escáner QR --- */
+.vault-card {
+    background: var(--white);
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+}
+
+.vault-card h3 {
+    margin-bottom: 20px;
+    color: var(--primary-blue);
+}
+
+/* --- Tablas de Inventario --- */
+.vault-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--white);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.vault-table thead {
+    background-color: var(--primary-blue);
+    color: var(--white);
+}
+
+.vault-table th, .vault-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.vault-table tbody tr:hover {
+    background-color: #f1f5f9;
+}
+
+/* --- Formularios --- */
+.vault-form-group {
+    margin-bottom: 15px;
+}
+
+.vault-form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.vault-form-control {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.vault-form-control:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+/* --- Botones --- */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-primary {
+    background-color: var(--accent-blue);
+    color: var(--white);
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-hover);
+}
+
+.btn-danger {
+    background-color: var(--danger-red);
+    color: var(--white);
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+/* --- Sección del Lector QR/Barras --- */
+.qr-scanner-box {
+    border: 2px dashed var(--accent-blue);
+    border-radius: 8px;
+    padding: 40px;
+    text-align: center;
+    background-color: #f8fbff;
+    margin-bottom: 20px;
+}
+
+.qr-scanner-box img {
+    max-width: 150px;
+    opacity: 0.7;
+}
