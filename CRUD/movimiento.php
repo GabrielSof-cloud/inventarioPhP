@@ -53,6 +53,7 @@ $stmt->close();
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <link rel="stylesheet" href="../style.css">
 <meta charset="UTF-8">
 <title>Historial de Movimiento</title>
 </head>

@@ -23,7 +23,9 @@ $qrPath = !empty($e['qrcode_file']) ? 'qrcodes/' . $e['qrcode_file'] : null;
 ?>
 <!doctype html>
 <html lang="es">
-<head><meta charset="utf-8"><title>Equipo <?=htmlspecialchars($e['serie'])?></title></head>
+<head>
+<link rel="stylesheet" href="style.css">  
+<meta charset="utf-8"><title>Equipo <?=htmlspecialchars($e['serie'])?></title></head>
 <body>
 <h2>Equipo <?=htmlspecialchars($e['serie'])?></h2>
 <ul>
