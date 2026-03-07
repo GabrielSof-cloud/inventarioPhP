@@ -54,71 +54,58 @@ $stmt->close();
 <html lang="es">
 <head>
     <link rel="stylesheet" href="../style.css">
-<meta charset="UTF-8">
-<title>Historial de Movimiento</title>
+    <meta charset="UTF-8">
+    <title>Detalle de Movimiento - VAULT</title>
+    <link rel="stylesheet" href="../style.css">
 </head>
 <body>
 
-<h2>Estado Actual (AHORA)</h2>
+<div class="vault-container">
+    <aside class="vault-sidebar">
+        <h2>VAULT</h2>
+        <ul>
+            <li><a href="dashboard.php">Dashboard</a></li>
+            <li><a href="create_form.php">Agregar Equipo</a></li>
+            <li><a href="Descartado.php">Descartados</a></li>
+            <li><a href="movidos.php">Trazabilidad</a></li>
+        </ul>
+    </aside>
 
-<table border="1">
-<tr>
-<th>ID</th>
-<th>Serie</th>
-<th>Modelo</th>
-<th>Usuario</th>
-<th>Departamento</th>
-<th>Ubicación</th>
-<th>Observaciones</th>
-</tr>
-<tr>
-<td><?php echo $equipo_actual['id']; ?></td>
-<td><?php echo htmlspecialchars($equipo_actual['serie']); ?></td>
-<td><?php echo htmlspecialchars($equipo_actual['modelo']); ?></td>
-<td><?php echo htmlspecialchars($equipo_actual['usuario']); ?></td>
-<td><?php echo htmlspecialchars($equipo_actual['departamento']); ?></td>
-<td><?php echo htmlspecialchars($equipo_actual['ubicacion']); ?></td>
-<td><?php echo htmlspecialchars($equipo_actual['observaciones']); ?></td>
-</tr>
-</table>
+    <main class="vault-main">
+        <header class="vault-header">
+            <h1>Detalle de Movimiento</h1>
+            <div class="user" style="font-weight: 600;">
+                Usuario: <?php echo htmlspecialchars($_SESSION['nombre']); ?> 
+                <a href="/logout.php" class="btn btn-danger" style="margin-left: 15px; padding: 5px 15px; font-size: 14px;">Salir</a>
+            </div>
+        </header>
 
-
-
-<?php if ($equipo_anterior): ?>
-
-<h2>Estado Anterior (ANTES)</h2>
-
-<table border="1">
-<tr>
-<th>Serie</th>
-<th>Modelo</th>
-<th>Usuario</th>
-<th>Departamento</th>
-<th>Ubicación</th>
-<th>Observaciones</th>
-<th>Fecha</th>
-<th>Tipo</th>
-</tr>
-<tr>
-<td><?php echo htmlspecialchars($equipo_anterior['serie']); ?></td>
-<td><?php echo htmlspecialchars($equipo_anterior['modelo']); ?></td>
-<td><?php echo htmlspecialchars($equipo_anterior['usuario']); ?></td>
-<td><?php echo htmlspecialchars($equipo_anterior['departamento']); ?></td>
-<td><?php echo htmlspecialchars($equipo_anterior['ubicacion']); ?></td>
-<td><?php echo htmlspecialchars($equipo_anterior['observaciones']); ?></td>
-<td><?php echo $equipo_anterior['fecha_movimiento']; ?></td>
-<td><?php echo $equipo_anterior['tipo_movimiento']; ?></td>
-</tr>
-</table>
-
-<hr>
-<hr>
-
-<?php endif; ?>
-
-<h2>Historial Completo</h2>
-
-<a href="movidos.php">Ver todo el historial</a>
-
-</body>
-</html>
+        <div class="vault-card" style="border-top: 4px solid var(--success-green);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: var(--text-dark); margin: 0; display: flex; align-items: center; gap: 10px;">
+                    🟢 Estado Actual (AHORA)
+                </h2>
+                <span style="background-color: #d4edda; color: #155724; padding: 5px 15px; border-radius: 20px; font-weight: 600; font-size: 14px;">
+                    Vigente
+                </span>
+            </div>
+            
+            <div style="overflow-x: auto; border-radius: 8px; border: 1px solid var(--border-color);">
+                <table class="vault-table" style="margin-bottom: 0;">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Serie</th>
+                            <th>Modelo</th>
+                            <th>Usuario</th>
+                            <th>Departamento</th>
+                            <th>Ubicación</th>
+                            <th>Observaciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><?php echo $equipo_actual['id']; ?></td>
+                            <td><?php echo htmlspecialchars($equipo_actual['serie']); ?></td>
+                            <td><?php echo htmlspecialchars($equipo_actual['modelo']); ?></td>
+                            <td><?php echo htmlspecialchars($equipo_actual['usuario']); ?></td>

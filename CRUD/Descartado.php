@@ -106,83 +106,86 @@ if ($q !== '') {
 <html lang="es">
 <head>
     <link rel="stylesheet" href="../style.css">
-<meta charset="UTF-8" />
-<title>Equipos descartados</title>
-<link rel="stylesheet" href="css/styles.css" />
+    <meta charset="UTF-8" />
+    <title>Equipos Descartados - VAULT</title>
+    <link rel="stylesheet" href="../style.css">
 </head>
 <body>
 
-<header>
-<h1>Equipos descartados</h1>
-<div class="user">
-Usuario: <?php echo htmlspecialchars($_SESSION['nombre']); ?> —
-<a href="/logout.php">Salir</a>
-</div>
-</header>
+<div class="vault-container">
+    <aside class="vault-sidebar">
+        <h2>VAULT</h2>
+        <ul>
+            <li><a href="dashboard.php">Dashboard</a></li>
+            <li><a href="create_form.php">Agregar Equipo</a></li>
+            <li><a href="Descartado.php">Descartados</a></li>
+            <li><a href="movidos.php">Trazabilidad</a></li>
+        </ul>
+    </aside>
 
-<div class="container">
+    <main class="vault-main">
+        <header class="vault-header">
+            <h1>Equipos Descartados</h1>
+            <div class="user" style="font-weight: 600;">
+                Usuario: <?php echo htmlspecialchars($_SESSION['nombre']); ?> 
+                <a href="/logout.php" class="btn btn-danger" style="margin-left: 15px; padding: 5px 15px; font-size: 14px;">Salir</a>
+            </div>
+        </header>
 
-<form method="get" action="Descartado.php" class="search-form">
-<input type="text" name="q" placeholder="Buscar..." value="<?php echo htmlspecialchars($q); ?>">
-<button type="submit">Buscar</button>
-<a href="dashboard.php" class="btn">Volver</a>
-</form>
+        <div class="vault-card">
+            <form method="get" action="Descartado.php" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 250px;">
+                    <input type="text" name="q" class="vault-form-control" placeholder="Buscar descartados por serie, modelo, motivo..." value="<?php echo htmlspecialchars($q); ?>">
+                </div>
+                <button type="submit" class="btn btn-primary">Buscar</button>
+                <a href="dashboard.php" class="btn" style="background-color: var(--text-muted); color: white;">Volver al Dashboard</a>
+            </form>
+        </div>
 
-<table class="table">
-<thead>
-<tr>
-<th>ID</th>
-<th>Serie</th>
-<th>Modelo</th>
-<th>Usuario</th>
-<th>Departamento</th>
-<th>Ubicación</th>
-<th>Observaciones</th>
-<th>Fecha Descarte</th>
-<th>Motivo</th>
-<th></th>
-<!-- <th>Acción</th> -->
-</tr>
-</thead>
+        <div class="vault-card" style="padding: 0; overflow: hidden; overflow-x: auto;">
+            <table class="vault-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Serie</th>
+                        <th>Modelo</th>
+                        <th>Usuario</th>
+                        <th>Departamento</th>
+                        <th>Ubicación</th>
+                        <th>Observaciones</th>
+                        <th>Fecha Descarte</th>
+                        <th>Motivo</th>
+                        <th style="text-align: center;">Acciones</th>
+                        </tr>
+                </thead>
+                <tbody>
+                    <?php if (count($results) === 0): ?>
+                    <tr>
+                        <td colspan="10" style="text-align: center; padding: 30px; color: var(--text-muted);">No hay equipos descartados.</td>
+                    </tr>
+                    <?php else: ?>
+                    <?php foreach ($results as $r): ?>
+                    <tr>
+                        <td><?php echo (int)$r['id']; ?></td>
+                        <td><?php echo htmlspecialchars($r['serie']); ?></td>
+                        <td><?php echo htmlspecialchars($r['modelo']); ?></td>
+                        <td><?php echo htmlspecialchars($r['usuario']); ?></td>
+                        <td><?php echo htmlspecialchars($r['departamento']); ?></td>
+                        <td><?php echo htmlspecialchars($r['ubicacion']); ?></td>
+                        <td><?php echo htmlspecialchars($r['observaciones']); ?></td>
+                        <td><?php echo htmlspecialchars($r['fecha_descarto']); ?></td>
+                        <td><?php echo htmlspecialchars($r['motivo']); ?></td>
+                        <td style="text-align: center; white-space: nowrap;">
+                            <a href="delete_equipo.php?id=<?php echo (int)$r['id']; ?>" class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;">Eliminar</a>
+                        </td>
 
-<tbody>
-
-<?php if (count($results) === 0): ?>
-<tr>
-<td colspan="10">No hay equipos descartados.</td>
-</tr>
-<?php else: ?>
-
-<?php foreach ($results as $r): ?>
-<tr>
-<td><?php echo (int)$r['id']; ?></td>
-<td><?php echo htmlspecialchars($r['serie']); ?></td>
-<td><?php echo htmlspecialchars($r['modelo']); ?></td>
-<td><?php echo htmlspecialchars($r['usuario']); ?></td>
-<td><?php echo htmlspecialchars($r['departamento']); ?></td>
-<td><?php echo htmlspecialchars($r['ubicacion']); ?></td>
-<td><?php echo htmlspecialchars($r['observaciones']); ?></td>
-<td><?php echo htmlspecialchars($r['fecha_descarto']); ?></td>
-<td><?php echo htmlspecialchars($r['motivo']); ?></td>
-<td><a href="delete_equipo.php?id=<?php echo (int)$r['id']; ?>">Eliminar</a></td>
-
-<!-- <td>
-<form method="post" style="display:inline;">
-<input type="hidden" name="restore_id" value="<?php echo (int)$r['id']; ?>">
-<button type="submit" onclick="return confirm('¿Restaurar este equipo?')">
-Restaurar
-</button>
-</form>
-</td> -->
-
-</tr>
-<?php endforeach; ?>
-
-<?php endif; ?>
-
-</tbody>
-</table>
-
+                        </tr>
+                    <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </main>
 </div>
 
 </body>

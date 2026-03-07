@@ -73,53 +73,89 @@ if (!$equipo) {
 <html lang="es">
 <head>
     <link rel="stylesheet" href="../style.css">
-<meta charset="UTF-8" />
-<title>Editar equipo</title>
-<link rel="stylesheet" href="css/styles.css" />
+    <meta charset="UTF-8" />
+    <title>Editar Equipo - VAULT</title>
+    <link rel="stylesheet" href="../style.css">
 </head>
 <body>
 
-<header>
-<h1>Inventario</h1>
-<div class="user">
-Usuario: <?php echo htmlspecialchars($_SESSION['nombre']); ?> —
-<a href="/logout.php">Salir</a>
-</div>
-</header>
+<div class="vault-container">
+    <aside class="vault-sidebar">
+        <h2>VAULT</h2>
+        <ul>
+            <li><a href="dashboard.php">Dashboard</a></li>
+            <li><a href="create_form.php">Agregar Equipo</a></li>
+            <li><a href="Descartado.php">Descartados</a></li>
+            <li><a href="movidos.php">Trazabilidad</a></li>
+        </ul>
+    </aside>
 
-<div class="form-box">
-<h2>Editar equipo</h2>
+    <main class="vault-main">
+        <header class="vault-header">
+            <h1>Gestión de Inventario</h1>
+            <div class="user" style="font-weight: 600;">
+                Usuario: <?php echo htmlspecialchars($_SESSION['nombre']); ?> 
+                <a href="/logout.php" class="btn btn-danger" style="margin-left: 15px; padding: 5px 15px; font-size: 14px;">Salir</a>
+            </div>
+        </header>
 
-<?php if ($err): ?>
-<p class="error"><?php echo htmlspecialchars($err); ?></p>
-<?php endif; ?>
+        <div class="vault-card" style="max-width: 800px; margin: 0 auto;">
+            <h2 style="color: var(--primary-blue); margin-bottom: 25px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;">
+                Editar Equipo: <?php echo htmlspecialchars($equipo['serie']); ?>
+            </h2>
 
-<?php if ($msg): ?>
-<p class="success"><?php echo htmlspecialchars($msg); ?></p>
-<?php endif; ?>
+            <?php if ($err): ?>
+                <div style="background-color: #f8d7da; color: #721c24; padding: 10px 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #f5c6cb;">
+                    <?php echo htmlspecialchars($err); ?>
+                </div>
+            <?php endif; ?>
 
-<form method="post" action="">
-<label>Serie</label>
-<input type="text" name="serie" value="<?php echo htmlspecialchars($equipo['serie']); ?>" required>
+            <?php if ($msg): ?>
+                <div style="background-color: #d4edda; color: #155724; padding: 10px 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #c3e6cb;">
+                    <?php echo htmlspecialchars($msg); ?>
+                </div>
+            <?php endif; ?>
 
-<label>Modelo</label>
-<input type="text" name="modelo" value="<?php echo htmlspecialchars($equipo['modelo']); ?>" required>
+            <form method="post" action="">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="vault-form-group">
+                        <label>Serie <span style="color: var(--danger-red);">*</span></label>
+                        <input type="text" name="serie" class="vault-form-control" value="<?php echo htmlspecialchars($equipo['serie']); ?>" required>
+                    </div>
+                    
+                    <div class="vault-form-group">
+                        <label>Modelo <span style="color: var(--danger-red);">*</span></label>
+                        <input type="text" name="modelo" class="vault-form-control" value="<?php echo htmlspecialchars($equipo['modelo']); ?>" required>
+                    </div>
 
-<label>Usuario</label>
-<input type="text" name="usuario" value="<?php echo htmlspecialchars($equipo['usuario']); ?>">
+                    <div class="vault-form-group">
+                        <label>Usuario Asignado</label>
+                        <input type="text" name="usuario" class="vault-form-control" value="<?php echo htmlspecialchars($equipo['usuario']); ?>">
+                    </div>
 
-<label>Departamento</label>
-<input type="text" name="departamento" value="<?php echo htmlspecialchars($equipo['departamento']); ?>">
+                    <div class="vault-form-group">
+                        <label>Departamento</label>
+                        <input type="text" name="departamento" class="vault-form-control" value="<?php echo htmlspecialchars($equipo['departamento']); ?>">
+                    </div>
 
-<label>Ubicación</label>
-<input type="text" name="ubicacion" value="<?php echo htmlspecialchars($equipo['ubicacion']); ?>">
+                    <div class="vault-form-group" style="grid-column: span 2;">
+                        <label>Ubicación Física</label>
+                        <input type="text" name="ubicacion" class="vault-form-control" value="<?php echo htmlspecialchars($equipo['ubicacion']); ?>">
+                    </div>
 
-<label>Observaciones</label>
-<textarea name="observaciones"><?php echo htmlspecialchars($equipo['observaciones']); ?></textarea>
+                    <div class="vault-form-group" style="grid-column: span 2;">
+                        <label>Observaciones</label>
+                        <textarea name="observaciones" class="vault-form-control" rows="3" style="resize: vertical;"><?php echo htmlspecialchars($equipo['observaciones']); ?></textarea>
+                    </div>
+                </div>
 
-<button type="submit">Guardar cambios</button>
-<a href="dashboard.php" class="btn">Cancelar</a>
-</form>
+                <div style="margin-top: 30px; text-align: right; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                    <a href="dashboard.php" class="btn" style="background-color: var(--text-muted); color: white; margin-right: 10px;">Cancelar</a>
+                    <button type="submit" class="btn btn-primary" style="padding: 10px 30px;">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </main>
 </div>
 
 </body>

@@ -34,7 +34,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <!doctype html>
 <html lang="es">
 <head>
-  <link rel="stylesheet" href="style.css">
 <meta charset="utf-8" />
 <title>Iniciar Sesión</title>
 <link rel="stylesheet" href="css/styles.css">

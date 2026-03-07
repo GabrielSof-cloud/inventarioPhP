@@ -97,41 +97,88 @@ if (!$equipo) {
 <html lang="es">
 <head>
     <link rel="stylesheet" href="../style.css">
-<meta charset="UTF-8">
-<title>mover Equipo</title>
+    <meta charset="UTF-8">
+    <title>Mover / Reasignar Equipo - VAULT</title>
+    <link rel="stylesheet" href="../style.css">
 </head>
 <body>
 
-<h2>Trazacion de Equipo</h2>
+<div class="vault-container">
+    <aside class="vault-sidebar">
+        <h2>VAULT</h2>
+        <ul>
+            <li><a href="dashboard.php">Dashboard</a></li>
+            <li><a href="create_form.php">Agregar Equipo</a></li>
+            <li><a href="Descartado.php">Descartados</a></li>
+            <li><a href="movidos.php">Trazabilidad</a></li>
+        </ul>
+    </aside>
 
-<form method="post">
+    <main class="vault-main">
+        <header class="vault-header">
+            <h1>Trazabilidad de Equipos</h1>
+            <div class="user" style="font-weight: 600;">
+                Usuario: <?php echo htmlspecialchars($_SESSION['nombre']); ?> 
+                <a href="/logout.php" class="btn btn-danger" style="margin-left: 15px; padding: 5px 15px; font-size: 14px;">Salir</a>
+            </div>
+        </header>
 
-<input type="hidden" name="id" value="<?php echo $equipo['id']; ?>">
+        <div class="vault-card" style="max-width: 800px; margin: 0 auto;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;">
+                <h2 style="color: var(--primary-blue); margin: 0;">Reasignar / Mover Equipo</h2>
+            </div>
 
-Serie:<br>
-<input type="text" name="serie" value="<?php echo htmlspecialchars($equipo['serie']); ?>"><br><br>
+            <div style="background-color: #e8f4fd; color: #004B87; padding: 15px 20px; border-left: 5px solid var(--accent-blue); border-radius: 4px; margin-bottom: 25px;">
+                <h4 style="margin-bottom: 5px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 1.2em;">ℹ️</span> Importante
+                </h4>
+                <p style="margin: 0; font-size: 0.95em;">Modifique únicamente los campos donde ocurrió el cambio. Por ejemplo: si se movió de un departamento a otro, cambie el valor de <strong>Departamento</strong> al nuevo destino. Lo mismo aplica si hubo un cambio de <strong>Ubicación</strong> o de <strong>Usuario responsable</strong>.</p>
+            </div>
 
-Modelo:<br>
-<input type="text" name="modelo" value="<?php echo htmlspecialchars($equipo['modelo']); ?>"><br><br>
+            <form method="post" action="">
+                <input type="hidden" name="id" value="<?php echo $equipo['id']; ?>">
 
-Usuario:<br>
-<input type="text" name="usuario" value="<?php echo htmlspecialchars($equipo['usuario']); ?>"><br><br>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="vault-form-group">
+                        <label>Serie <span style="color: var(--danger-red);">*</span></label>
+                        <input type="text" name="serie" class="vault-form-control" value="<?php echo htmlspecialchars($equipo['serie']); ?>" required>
+                    </div>
+                    
+                    <div class="vault-form-group">
+                        <label>Modelo <span style="color: var(--danger-red);">*</span></label>
+                        <input type="text" name="modelo" class="vault-form-control" value="<?php echo htmlspecialchars($equipo['modelo']); ?>" required>
+                    </div>
 
-Departamento:<br>
-<input type="text" name="departamento" value="<?php echo htmlspecialchars($equipo['departamento']); ?>"><br><br>
+                    <div class="vault-form-group">
+                        <label>Nuevo Usuario Asignado</label>
+                        <input type="text" name="usuario" class="vault-form-control" value="<?php echo htmlspecialchars($equipo['usuario']); ?>">
+                    </div>
 
-Ubicación:<br>
-<input type="text" name="ubicacion" value="<?php echo htmlspecialchars($equipo['ubicacion']); ?>"><br><br>
+                    <div class="vault-form-group">
+                        <label>Nuevo Departamento</label>
+                        <input type="text" name="departamento" class="vault-form-control" value="<?php echo htmlspecialchars($equipo['departamento']); ?>">
+                    </div>
 
-Observaciones:<br>
-<textarea name="observaciones"><?php echo htmlspecialchars($equipo['observaciones']); ?></textarea><br><br>
+                    <div class="vault-form-group" style="grid-column: span 2;">
+                        <label>Nueva Ubicación Física</label>
+                        <input type="text" name="ubicacion" class="vault-form-control" value="<?php echo htmlspecialchars($equipo['ubicacion']); ?>">
+                    </div>
 
-<button type="submit">Actualizar</button>
-<a href="dashboard.php">Cancelar</a>
+                    <div class="vault-form-group" style="grid-column: span 2;">
+                        <label>Observaciones del Movimiento</label>
+                        <textarea name="observaciones" class="vault-form-control" rows="3" style="resize: vertical;"><?php echo htmlspecialchars($equipo['observaciones']); ?></textarea>
+                    </div>
+                </div>
 
-</form>
+                <div style="margin-top: 30px; text-align: right; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                    <a href="dashboard.php" class="btn" style="background-color: var(--text-muted); color: white; margin-right: 10px;">Cancelar</a>
+                    <button type="submit" class="btn btn-primary" style="padding: 10px 30px; background-color: #17a2b8;">Registrar Movimiento</button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
 
-<h1>Importante</h1>
-<p>modifique los campos donde ocurrio el cambio de este equipo ejemplo: si se movio de un departamento a otro, cambie el valor de departamento al nuevo departamento. Lo mismo si fue de ubicacion o de usuario</p>
 </body>
 </html>
