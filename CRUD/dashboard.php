@@ -30,60 +30,81 @@ if ($q !== '') {
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<title>Dashboard - Inventario</title>
-<link rel="stylesheet" href="css/styles.css" />
+    <meta charset="UTF-8" />
+    <title>Dashboard - VAULT Inventario</title>
+    <link rel="stylesheet" href="../style.css">
 </head>
 <body>
-<header>
-<h1>Inventario</h1>
-<div class="user">Usuario: <?php echo htmlspecialchars($_SESSION['nombre']); ?> — <a href="/logout.php">Salir</a></div>
-</header>
 
-<div class="container">
-<form method="get" action="dashboard.php" class="search-form">
-<input type="text" name="q" placeholder="Buscar..." value="<?php echo htmlspecialchars($q); ?>">
-<button type="submit">Buscar</button>
-<a href="create_form.php" class="btn">Agregar equipo</a>
-<a href="Descartado.php" class="btn">descartados</a>
-<a href="movidos.php" class="btn">trazacion de equipos</a>
-</form>
+<div class="vault-container">
+    <aside class="vault-sidebar">
+        <h2>VAULT</h2>
+        <ul>
+            <li><a href="dashboard.php">Dashboard</a></li>
+            <li><a href="create_form.php">Agregar Equipo</a></li>
+            <li><a href="Descartado.php">Descartados</a></li>
+            <li><a href="movidos.php">Trazabilidad</a></li>
+        </ul>
+    </aside>
 
-<table class="table">
-<thead>
-<tr>
-<th>ID</th>
-<th>Serie</th>
-<th>Modelo</th>
-<th>Usuario</th>
-<th>Departamento</th>
-<th>Ubicación</th>
-<th></th>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<?php if (count($results) === 0): ?>
-<tr><td colspan="6">No se encontraron registros.</td></tr>
-<?php else: ?>
-<?php foreach ($results as $r): ?>
-<tr>
-<td><?php echo (int)$r['id']; ?></td>
-<td><?php echo htmlspecialchars($r['serie']); ?></td>
-<td><?php echo htmlspecialchars($r['modelo']); ?></td>
-<td><?php echo htmlspecialchars($r['usuario']); ?></td>
-<td><?php echo htmlspecialchars($r['departamento']); ?></td>
-<td><?php echo htmlspecialchars($r['ubicacion']); ?></td>
-<td><a href="confirmar_descarto.php?id=<?php echo (int)$r['id']; ?>">Descartar</a></td>
-<td><a href="edit_equipo.php?id=<?php echo (int)$r['id']; ?>">Editar</a></td>
-<td><a href="mover.php?id=<?php echo (int)$r['id']; ?>">Mover</a></td>
-</tr>
-<?php endforeach; ?>
-<?php endif; ?>
-</tbody>
-</table>
+    <main class="vault-main">
+        <header class="vault-header">
+            <h1>Panel de Control</h1>
+            <div class="user" style="font-weight: 600;">
+                Usuario: <?php echo htmlspecialchars($_SESSION['nombre']); ?> 
+                <a href="/logout.php" class="btn btn-danger" style="margin-left: 15px; padding: 5px 15px; font-size: 14px;">Salir</a>
+            </div>
+        </header>
+
+        <div class="vault-card">
+            <form method="get" action="dashboard.php" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 250px;">
+                    <input type="text" name="q" class="vault-form-control" placeholder="Buscar por serie, modelo, departamento..." value="<?php echo htmlspecialchars($q); ?>">
+                </div>
+                <button type="submit" class="btn btn-primary">Buscar</button>
+            </form>
+        </div>
+
+        <div class="vault-card" style="padding: 0; overflow: hidden;">
+            <table class="vault-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Serie</th>
+                        <th>Modelo</th>
+                        <th>Usuario</th>
+                        <th>Departamento</th>
+                        <th>Ubicación</th>
+                        <th style="text-align: center;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (count($results) === 0): ?>
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 30px; color: var(--text-muted);">No se encontraron registros.</td>
+                    </tr>
+                    <?php else: ?>
+                    <?php foreach ($results as $r): ?>
+                    <tr>
+                        <td><?php echo (int)$r['id']; ?></td>
+                        <td><?php echo htmlspecialchars($r['serie']); ?></td>
+                        <td><?php echo htmlspecialchars($r['modelo']); ?></td>
+                        <td><?php echo htmlspecialchars($r['usuario']); ?></td>
+                        <td><?php echo htmlspecialchars($r['departamento']); ?></td>
+                        <td><?php echo htmlspecialchars($r['ubicacion']); ?></td>
+                        <td style="text-align: center; white-space: nowrap;">
+                            <a href="edit_equipo.php?id=<?php echo (int)$r['id']; ?>" class="btn btn-primary" style="padding: 5px 10px; font-size: 12px; margin-right: 5px;">Editar</a>
+                            <a href="mover.php?id=<?php echo (int)$r['id']; ?>" class="btn btn-primary" style="padding: 5px 10px; font-size: 12px; margin-right: 5px; background-color: #17a2b8;">Mover</a>
+                            <a href="confirmar_descarto.php?id=<?php echo (int)$r['id']; ?>" class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;">Descartar</a>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </main>
 </div>
+
 </body>
 </html>
-    

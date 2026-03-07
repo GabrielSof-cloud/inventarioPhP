@@ -96,6 +96,7 @@ if (!$equipo) {
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <link rel="stylesheet" href="../style.css">
 <meta charset="UTF-8">
 <title>mover Equipo</title>
 </head>

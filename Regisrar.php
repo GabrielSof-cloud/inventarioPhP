@@ -8,6 +8,7 @@ if (isset($_SESSION['user_id'])) {
 <!doctype html>
 <html lang="es">
 <head>
+  <link rel="stylesheet" href="style.css">
 <meta charset="utf-8" />
 <title>Regisrarse</title>
 <link rel="stylesheet" href="css/styles.css">

@@ -22,6 +22,7 @@ if (!file_exists($rutaQR)) {
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <link rel="stylesheet" href="../style.css">
     <meta charset="UTF-8">
     <title>QR del equipo</title>
 </head>
