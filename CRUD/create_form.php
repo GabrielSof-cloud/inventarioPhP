@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once $_SERVER['DOCUMENT_ROOT'].'/DBconn/conexion.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/qrcodes/qr.php';
+require_once __DIR__ . '/../DBconn/conexion.php';
+require_once __DIR__ . '/../qrcodes/qr.php';
 
 if (empty($_SESSION['user_id'])) {
     header('Location: /Loging.php');
@@ -26,21 +26,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Insertar en la base de datos
         $stmt = $conn->prepare("INSERT INTO equipos (serie, modelo, usuario, departamento, ubicacion, observaciones) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("ssssss", $serie, $modelo, $usuario, $departamento, $ubicacion, $observaciones);
-        if ($stmt->execute()) {
-           
+        
+        try {
+            $stmt->execute();
+            
             $serial = $serie;
-            $ip = "10.0.0.165";
-            $urlqr = "http://$ip/proyectoFinal/CRUD/dashboard.php?q=".urlencode($serial);
-            $ruta = 'qrs/qr_'.$serial.'.png';
+            $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
+            $host = $_SERVER['HTTP_HOST'];
+            $urlqr = "$protocol://$host/proyectoFinal/inventarioPhP/public_view.php?serie=" . urlencode($serial);
+            
+            $serialSeguro = preg_replace('/[^A-Za-z0-9_\-]/', '_', $serial);
+            $ruta = 'qrs/qr_' . $serialSeguro . '.png';
             generalQR($urlqr, $ruta, 4);
-        header("Location: ver_qr.php?serie=" . urlencode($serial));
-          exit;
-           
-        } else {
-            $err = 'Error al guardar el equipo.';
+            header("Location: ver_qr.php?serie=" . urlencode($serial));
+            exit;
+            
+        } catch (mysqli_sql_exception $e) {
+            if ($e->getCode() == 1062) {
+                $err = 'Error: Ya existe un equipo registrado con el número de serie ' . htmlspecialchars($serie) . '.';
+            } else {
+                $err = 'Error al guardar el equipo: ' . $e->getMessage();
+            }
+        } finally {
+            $stmt->close();
         }
-         
-        $stmt->close();
     }
 }
 
@@ -110,12 +119,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <div class="vault-form-group">
                         <label>Departamento</label>
-                        <input type="text" name="departamento" class="vault-form-control" placeholder="Ej: Contabilidad, TI...">
+                        <select name="departamento" class="vault-form-control">
+                            <option value="">Seleccione un departamento...</option>
+                            <option value="Dirección General">Dirección General</option>
+                            <option value="Administración y Finanzas">Administración y Finanzas</option>
+                            <option value="Recursos Humanos">Recursos Humanos</option>
+                            <option value="Tecnología de la Información (TI)">Tecnología de la Información (TI)</option>
+                            <option value="Operaciones">Operaciones</option>
+                            <option value="Ventas">Ventas</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Logística / Almacén">Logística / Almacén</option>
+                            <option value="Soporte Técnico">Soporte Técnico</option>
+                            <option value="Mantenimiento">Mantenimiento</option>
+                            <option value="Otro">Otro</option>
+                        </select>
                     </div>
 
                     <div class="vault-form-group" style="grid-column: span 2;">
                         <label>Ubicación Física</label>
-                        <input type="text" name="ubicacion" class="vault-form-control" placeholder="Ej: Edificio Principal, Piso 2, Oficina 4">
+                        <select name="ubicacion" class="vault-form-control">
+                            <option value="">Seleccione una sucursal (Promipyme)...</option>
+                            <option value="Sede Principal (Santo Domingo)">Sede Principal (Santo Domingo)</option>
+                            <option value="Manoguayabo (Santo Domingo)">Manoguayabo (Santo Domingo)</option>
+                            <option value="Santo Domingo Este">Santo Domingo Este</option>
+                            <option value="Santo Domingo Norte">Santo Domingo Norte</option>
+                            <option value="Santiago">Santiago</option>
+                            <option value="La Vega">La Vega</option>
+                            <option value="San Francisco de Macorís">San Francisco de Macorís</option>
+                            <option value="Puerto Plata">Puerto Plata</option>
+                            <option value="Azua">Azua</option>
+                            <option value="San Juan de la Maguana">San Juan de la Maguana</option>
+                            <option value="Barahona">Barahona</option>
+                            <option value="San Pedro de Macorís">San Pedro de Macorís</option>
+                            <option value="La Romana">La Romana</option>
+                            <option value="Higüey">Higüey</option>
+                            <option value="San Cristóbal">San Cristóbal</option>
+                            <option value="Baní">Baní</option>
+                        </select>
                     </div>
 
                     <div class="vault-form-group" style="grid-column: span 2;">

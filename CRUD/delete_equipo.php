@@ -1,13 +1,17 @@
 <?php
-// Asegurar que la sesión esté iniciada para la barra superior
+// Asegurar que la sesión esté iniciada y el usuario autenticado
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
+}
+if (empty($_SESSION['user_id'])) {
+    header('Location: ../Login.php');
+    exit;
 }
 
 // ===============================
 // CONEXIÓN
 // ===============================
-require_once $_SERVER['DOCUMENT_ROOT'].'/DBconn/conexion.php';
+require_once __DIR__ . '/../DBconn/conexion.php';
 
 // ===============================
 // VALIDAR ID
@@ -18,22 +22,25 @@ if (!isset($_GET['id']) && !isset($_POST['id'])) {
 }
 
 // Si viene por GET (primera vez)
-$id = $_GET['id'] ?? $_POST['id'];
+$id = isset($_GET['id']) ? intval($_GET['id']) : intval($_POST['id']);
 
 // ===============================
 // PROCESAR ELIMINACIÓN
 // ===============================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmar'])) {
-
-    $sqlDelete = "DELETE FROM descarto WHERE id = ?";
-    $stmtDelete = $conn->prepare($sqlDelete);
-    $stmtDelete->bind_param("i", $id);
-
-    if ($stmtDelete->execute()) {
-        header("Location: Descartado.php");
-        exit;
+    // Validar token CSRF
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
+        $error = 'Petición inválida.';
     } else {
-        $error = "❌ Error al eliminar el registro";
+        $sqlDelete = "DELETE FROM descarto WHERE id = ?";
+        $stmtDelete = $conn->prepare($sqlDelete);
+        $stmtDelete->bind_param("i", $id);
+        if ($stmtDelete->execute()) {
+            header("Location: Descartado.php");
+            exit;
+        } else {
+            $error = "❌ Error al eliminar el registro";
+        }
     }
 }
 
@@ -50,20 +57,13 @@ if ($resultado->num_rows === 0) {
     header("Location: Descartado.php");
     exit;
 }
-
 $equipo = $resultado->fetch_assoc();
+
+// Generar token CSRF si no existe
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 ?>
-
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <link rel="stylesheet" href="../style.css">
-    <meta charset="UTF-8">
-    <title>Eliminar Equipo Definitivamente - VAULT</title>
-    <link rel="stylesheet" href="../style.css">
-</head>
-<body>
-
 <div class="vault-container">
     <aside class="vault-sidebar">
         <h2>VAULT</h2>
@@ -110,35 +110,4 @@ $equipo = $resultado->fetch_assoc();
                             <th>Observaciones</th>
                             <th>Fecha Descarte</th>
                             <th>Motivo</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><?php echo $equipo['id']; ?></td>
-                            <td><?php echo htmlspecialchars($equipo['serie']); ?></td>
-                            <td><?php echo htmlspecialchars($equipo['modelo']); ?></td>
-                            <td><?php echo htmlspecialchars($equipo['usuario']); ?></td>
-                            <td><?php echo htmlspecialchars($equipo['departamento']); ?></td>
-                            <td><?php echo htmlspecialchars($equipo['ubicacion']); ?></td>
-                            <td><?php echo htmlspecialchars($equipo['observaciones']); ?></td>
-                            <td><?php echo htmlspecialchars($equipo['fecha_descarto']); ?></td>
-                            <td><?php echo htmlspecialchars($equipo['motivo']); ?></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div style="text-align: center; border-top: 1px solid var(--border-color); padding-top: 25px;">
-                <form method="POST" action="">
-                    <input type="hidden" name="id" value="<?php echo $equipo['id']; ?>">
-                    <a href="Descartado.php" class="btn" style="background-color: var(--text-muted); color: white; margin-right: 15px; padding: 12px 30px;">Cancelar</a>
-                    <button type="submit" name="confirmar" class="btn btn-danger" style="padding: 12px 30px;">Sí, Eliminar Definitivamente</button>
-                </form>
-            </div>
-            
-        </div>
-    </main>
-</div>
-
-</body>
-</html>
+                            }

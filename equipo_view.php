@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once $_SERVER['DOCUMENT_ROOT'].'/DBconn/conexion.php';
+require_once __DIR__ . '/DBconn/conexion.php';
 
 if (empty($_SESSION['user_id'])) {
     header('Location: Loging.php');
@@ -19,7 +19,9 @@ $stmt->close();
 
 if (!$e) { echo "Equipo no encontrado."; exit; }
 
-$qrPath = !empty($e['qrcode_file']) ? 'qrcodes/' . $e['qrcode_file'] : null;
+$serialSeguro = preg_replace('/[^A-Za-z0-9_\-]/', '_', $e['serie']);
+$rutaQR_rel = "CRUD/qrs/qr_" . $serialSeguro . ".png";
+$qrPath = file_exists(__DIR__ . '/' . $rutaQR_rel) ? $rutaQR_rel : null;
 ?>
 <!doctype html>
 <html lang="es">

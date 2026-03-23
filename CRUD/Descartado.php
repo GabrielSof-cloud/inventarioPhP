@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once $_SERVER['DOCUMENT_ROOT'].'/DBconn/conexion.php';
+require_once __DIR__ . '/../DBconn/conexion.php';
 
 if (empty($_SESSION['user_id'])) {
     header('Location: /Loging.php');
@@ -155,8 +155,7 @@ if ($q !== '') {
                         <th>Observaciones</th>
                         <th>Fecha Descarte</th>
                         <th>Motivo</th>
-                        <th style="text-align: center;">Acciones</th>
-                        </tr>
+                    </tr>
                 </thead>
                 <tbody>
                     <?php if (count($results) === 0): ?>
@@ -175,11 +174,7 @@ if ($q !== '') {
                         <td><?php echo htmlspecialchars($r['observaciones']); ?></td>
                         <td><?php echo htmlspecialchars($r['fecha_descarto']); ?></td>
                         <td><?php echo htmlspecialchars($r['motivo']); ?></td>
-                        <td style="text-align: center; white-space: nowrap;">
-                            <a href="delete_equipo.php?id=<?php echo (int)$r['id']; ?>" class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;">Eliminar</a>
-                        </td>
-
-                        </tr>
+                    </tr>
                     <?php endforeach; ?>
                     <?php endif; ?>
                 </tbody>

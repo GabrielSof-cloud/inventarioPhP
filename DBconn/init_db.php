@@ -1,5 +1,5 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'].'/DBconn/conexion.php';
+require_once __DIR__ . '/conexion.php';
 
 
 // Crear tabla usuarios
@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     nombre VARCHAR(150) NOT NULL,
     email VARCHAR(200) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
+    ubicacion_fisica VARCHAR(255),
     activo TINYINT DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -1,9 +1,9 @@
 <?php
 session_start();
-require_once $_SERVER['DOCUMENT_ROOT'].'/DBconn/conexion.php';
+require_once __DIR__ . '/../DBconn/conexion.php';
 
 if (empty($_SESSION['user_id'])) {
-    header('Location: /Loging.php');
+    header('Location: /Login.php');
     exit;
 }
 

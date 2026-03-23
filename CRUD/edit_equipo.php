@@ -1,10 +1,15 @@
 <?php
 session_start();
-require_once $_SERVER['DOCUMENT_ROOT'].'/DBconn/conexion.php';
+require_once __DIR__ . '/../DBconn/conexion.php';
 
 if (empty($_SESSION['user_id'])) {
-    header('Location: /Loging.php');
+    header('Location: /Login.php');
     exit;
+}
+
+// Generar token CSRF si no existe
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 $err = '';
@@ -14,45 +19,50 @@ $msg = '';
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 if ($id <= 0) {
-    die('ID inválido');
+    header('Location: dashboard.php?error=ID_invalido');
+    exit;
 }
 
 // 2️⃣ Si viene POST → actualizar
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    $serie = trim($_POST['serie'] ?? '');
-    $modelo = trim($_POST['modelo'] ?? '');
-    $usuario = trim($_POST['usuario'] ?? '');
-    $departamento = trim($_POST['departamento'] ?? '');
-    $ubicacion = trim($_POST['ubicacion'] ?? '');
-    $observaciones = trim($_POST['observaciones'] ?? '');
-
-    if (!$serie || !$modelo) {
-        $err = 'Serie y Modelo son obligatorios.';
+    // Validar token CSRF
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        $err = 'Petición inválida.';
     } else {
-        $sql = "UPDATE equipos 
-                SET serie=?, modelo=?, usuario=?, departamento=?, ubicacion=?, observaciones=? 
-                WHERE id=?";
+        $serie = htmlspecialchars(trim($_POST['serie'] ?? ''));
+        $modelo = htmlspecialchars(trim($_POST['modelo'] ?? ''));
+        $usuario = htmlspecialchars(trim($_POST['usuario'] ?? ''));
+        $departamento = htmlspecialchars(trim($_POST['departamento'] ?? ''));
+        $ubicacion = htmlspecialchars(trim($_POST['ubicacion'] ?? ''));
+        $observaciones = htmlspecialchars(trim($_POST['observaciones'] ?? ''));
 
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param(
-            "ssssssi",
-            $serie,
-            $modelo,
-            $usuario,
-            $departamento,
-            $ubicacion,
-            $observaciones,
-            $id
-        );
-
-        if ($stmt->execute()) {
-            $msg = 'Equipo actualizado correctamente.';
+        if (!$serie || !$modelo) {
+            $err = 'Serie y Modelo son obligatorios.';
         } else {
-            $err = 'Error al actualizar el equipo.';
-        }
+            $sql = "UPDATE equipos 
+                    SET serie=?, modelo=?, usuario=?, departamento=?, ubicacion=?, observaciones=? 
+                    WHERE id=?";
 
-        $stmt->close();
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param(
+                "ssssssi",
+                $serie,
+                $modelo,
+                $usuario,
+                $departamento,
+                $ubicacion,
+                $observaciones,
+                $id
+            );
+
+            if ($stmt->execute()) {
+                $msg = 'Equipo actualizado correctamente.';
+            } else {
+                $err = 'Error al actualizar el equipo.';
+            }
+
+            $stmt->close();
+        }
     }
 }
 
@@ -116,7 +126,8 @@ if (!$equipo) {
                 </div>
             <?php endif; ?>
 
-            <form method="post" action="">
+            <form method="post" action="" autocomplete="off">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div class="vault-form-group">
                         <label>Serie <span style="color: var(--danger-red);">*</span></label>
@@ -135,12 +146,59 @@ if (!$equipo) {
 
                     <div class="vault-form-group">
                         <label>Departamento</label>
-                        <input type="text" name="departamento" class="vault-form-control" value="<?php echo htmlspecialchars($equipo['departamento']); ?>">
+                        <select name="departamento" class="vault-form-control">
+                            <option value="">Seleccione un departamento...</option>
+                            <?php 
+                            $departamentos_std = [
+                                'Dirección General',
+                                'Administración y Finanzas',
+                                'Recursos Humanos',
+                                'Tecnología de la Información (TI)',
+                                'Operaciones',
+                                'Ventas',
+                                'Marketing',
+                                'Logística / Almacén',
+                                'Soporte Técnico',
+                                'Mantenimiento',
+                                'Otro'
+                            ];
+                            $depto_actual = $equipo['departamento'];
+                            $found = false;
+                            foreach ($departamentos_std as $depto) {
+                                $selected = ($depto_actual === $depto) ? 'selected' : '';
+                                if ($depto_actual === $depto) $found = true;
+                                echo "<option value=\"" . htmlspecialchars($depto) . "\" $selected>" . htmlspecialchars($depto) . "</option>\n";
+                            }
+                            if ($depto_actual && !$found) {
+                                echo "<option value=\"" . htmlspecialchars($depto_actual) . "\" selected>" . htmlspecialchars($depto_actual) . " (Actual)</option>\n";
+                            }
+                            ?>
+                        </select>
                     </div>
 
                     <div class="vault-form-group" style="grid-column: span 2;">
                         <label>Ubicación Física</label>
-                        <input type="text" name="ubicacion" class="vault-form-control" value="<?php echo htmlspecialchars($equipo['ubicacion']); ?>">
+                        <select name="ubicacion" class="vault-form-control">
+                            <option value="">Seleccione una sucursal (Promipyme)...</option>
+                            <?php 
+                            $sucursales_std = [
+                                'Sede Principal (Santo Domingo)', 'Manoguayabo (Santo Domingo)', 'Santo Domingo Este', 'Santo Domingo Norte',
+                                'Santiago', 'La Vega', 'San Francisco de Macorís', 'Puerto Plata', 'Azua',
+                                'San Juan de la Maguana', 'Barahona', 'San Pedro de Macorís', 'La Romana',
+                                'Higüey', 'San Cristóbal', 'Baní'
+                            ];
+                            $ubicacion_actual = $equipo['ubicacion'];
+                            $found_ub = false;
+                            foreach ($sucursales_std as $suc) {
+                                $selected_ub = ($ubicacion_actual === $suc) ? 'selected' : '';
+                                if ($ubicacion_actual === $suc) $found_ub = true;
+                                echo "<option value=\"" . htmlspecialchars($suc) . "\" $selected_ub>" . htmlspecialchars($suc) . "</option>\n";
+                            }
+                            if ($ubicacion_actual && !$found_ub) {
+                                echo "<option value=\"" . htmlspecialchars($ubicacion_actual) . "\" selected>" . htmlspecialchars($ubicacion_actual) . " (Actual)</option>\n";
+                            }
+                            ?>
+                        </select>
                     </div>
 
                     <div class="vault-form-group" style="grid-column: span 2;">

@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once $_SERVER['DOCUMENT_ROOT'].'/DBconn/conexion.php';
+require_once __DIR__ . '/../DBconn/conexion.php';
 
 if (empty($_SESSION['user_id'])) {
     header('Location: /Loging.php');
@@ -157,12 +157,59 @@ if (!$equipo) {
 
                     <div class="vault-form-group">
                         <label>Nuevo Departamento</label>
-                        <input type="text" name="departamento" class="vault-form-control" value="<?php echo htmlspecialchars($equipo['departamento']); ?>">
+                        <select name="departamento" class="vault-form-control">
+                            <option value="">Seleccione un departamento...</option>
+                            <?php 
+                            $departamentos_std = [
+                                'Dirección General',
+                                'Administración y Finanzas',
+                                'Recursos Humanos',
+                                'Tecnología de la Información (TI)',
+                                'Operaciones',
+                                'Ventas',
+                                'Marketing',
+                                'Logística / Almacén',
+                                'Soporte Técnico',
+                                'Mantenimiento',
+                                'Otro'
+                            ];
+                            $depto_actual = $equipo['departamento'];
+                            $found = false;
+                            foreach ($departamentos_std as $depto) {
+                                $selected = ($depto_actual === $depto) ? 'selected' : '';
+                                if ($depto_actual === $depto) $found = true;
+                                echo "<option value=\"" . htmlspecialchars($depto) . "\" $selected>" . htmlspecialchars($depto) . "</option>\n";
+                            }
+                            if ($depto_actual && !$found) {
+                                echo "<option value=\"" . htmlspecialchars($depto_actual) . "\" selected>" . htmlspecialchars($depto_actual) . " (Actual)</option>\n";
+                            }
+                            ?>
+                        </select>
                     </div>
 
                     <div class="vault-form-group" style="grid-column: span 2;">
                         <label>Nueva Ubicación Física</label>
-                        <input type="text" name="ubicacion" class="vault-form-control" value="<?php echo htmlspecialchars($equipo['ubicacion']); ?>">
+                        <select name="ubicacion" class="vault-form-control">
+                            <option value="">Seleccione una sucursal (Promipyme)...</option>
+                            <?php 
+                            $sucursales_std = [
+                                'Sede Principal (Santo Domingo)', 'Manoguayabo (Santo Domingo)', 'Santo Domingo Este', 'Santo Domingo Norte',
+                                'Santiago', 'La Vega', 'San Francisco de Macorís', 'Puerto Plata', 'Azua',
+                                'San Juan de la Maguana', 'Barahona', 'San Pedro de Macorís', 'La Romana',
+                                'Higüey', 'San Cristóbal', 'Baní'
+                            ];
+                            $ubicacion_actual = $equipo['ubicacion'];
+                            $found_ub = false;
+                            foreach ($sucursales_std as $suc) {
+                                $selected_ub = ($ubicacion_actual === $suc) ? 'selected' : '';
+                                if ($ubicacion_actual === $suc) $found_ub = true;
+                                echo "<option value=\"" . htmlspecialchars($suc) . "\" $selected_ub>" . htmlspecialchars($suc) . "</option>\n";
+                            }
+                            if ($ubicacion_actual && !$found_ub) {
+                                echo "<option value=\"" . htmlspecialchars($ubicacion_actual) . "\" selected>" . htmlspecialchars($ubicacion_actual) . " (Actual)</option>\n";
+                            }
+                            ?>
+                        </select>
                     </div>
 
                     <div class="vault-form-group" style="grid-column: span 2;">
