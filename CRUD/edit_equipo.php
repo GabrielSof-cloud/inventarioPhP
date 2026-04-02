@@ -36,22 +36,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $ubicacion = htmlspecialchars(trim($_POST['ubicacion'] ?? ''));
         $observaciones = htmlspecialchars(trim($_POST['observaciones'] ?? ''));
 
+        // NUEVOS CAMPOS DE DEPRECIACIÓN
+        $costo_inicial = trim($_POST['costo_inicial'] ?? 0);
+        $fecha_adquisicion = trim($_POST['fecha_adquisicion'] ?? date('Y-m-d'));
+        $tasa_depreciacion = trim($_POST['tasa_depreciacion'] ?? 0.05);
+
         if (!$serie || !$modelo) {
             $err = 'Serie y Modelo son obligatorios.';
         } else {
+            // Se agregaron los campos de depreciación al UPDATE
             $sql = "UPDATE equipos 
-                    SET serie=?, modelo=?, usuario=?, departamento=?, ubicacion=?, observaciones=? 
+                    SET serie=?, modelo=?, usuario=?, departamento=?, ubicacion=?, observaciones=?, costo_inicial=?, fecha_adquisicion=?, tasa_depreciacion_mensual=? 
                     WHERE id=?";
 
             $stmt = $conn->prepare($sql);
+            // 9 strings/decimales ("s") y 1 entero ("i") para el ID
             $stmt->bind_param(
-                "ssssssi",
+                "sssssssssi",
                 $serie,
                 $modelo,
                 $usuario,
                 $departamento,
                 $ubicacion,
                 $observaciones,
+                $costo_inicial,
+                $fecha_adquisicion,
+                $tasa_depreciacion,
                 $id
             );
 
@@ -85,7 +95,6 @@ if (!$equipo) {
     <link rel="stylesheet" href="../style.css">
     <meta charset="UTF-8" />
     <title>Editar Equipo - VAULT</title>
-    <link rel="stylesheet" href="../style.css">
 </head>
 <body>
 
@@ -104,7 +113,7 @@ if (!$equipo) {
         <header class="vault-header">
             <h1>Gestión de Inventario</h1>
             <div class="user" style="font-weight: 600;">
-                Usuario: <?php echo htmlspecialchars($_SESSION['nombre']); ?> 
+                Usuario: <?php echo htmlspecialchars($_SESSION['nombre'] ?? 'Desconocido'); ?> 
                 <a href="/logout.php" class="btn btn-danger" style="margin-left: 15px; padding: 5px 15px; font-size: 14px;">Salir</a>
             </div>
         </header>
@@ -176,6 +185,22 @@ if (!$equipo) {
                         </select>
                     </div>
 
+                    <div class="vault-form-group">
+                        <label>Costo Inicial ($) <span style="color: var(--danger-red);">*</span></label>
+                        <input type="number" step="0.01" name="costo_inicial" class="vault-form-control" value="<?php echo htmlspecialchars($equipo['costo_inicial'] ?? 0); ?>" required>
+                    </div>
+
+                    <div class="vault-form-group">
+                        <label>Fecha de Adquisición <span style="color: var(--danger-red);">*</span></label>
+                        <input type="date" name="fecha_adquisicion" class="vault-form-control" value="<?php echo htmlspecialchars($equipo['fecha_adquisicion'] ?? date('Y-m-d')); ?>" required>
+                    </div>
+
+                    <div class="vault-form-group" style="grid-column: span 2;">
+                        <label>Tasa de Depreciación Mensual</label>
+                        <input type="number" step="0.01" name="tasa_depreciacion" class="vault-form-control" value="<?php echo htmlspecialchars($equipo['tasa_depreciacion_mensual'] ?? 0.05); ?>" required>
+                        <small style="color: #6c757d; font-size: 12px; margin-top: 5px; display: block;">El valor 0.05 equivale al 5% mensual. Solo modifícalo si este equipo se deprecia a un ritmo distinto.</small>
+                    </div>
+
                     <div class="vault-form-group" style="grid-column: span 2;">
                         <label>Ubicación Física</label>
                         <select name="ubicacion" class="vault-form-control">
@@ -208,7 +233,7 @@ if (!$equipo) {
                 </div>
 
                 <div style="margin-top: 30px; text-align: right; border-top: 1px solid var(--border-color); padding-top: 20px;">
-                    <a href="dashboard.php" class="btn" style="background-color: var(--text-muted); color: white; margin-right: 10px;">Cancelar</a>
+                    <a href="dashboard.php" class="btn" style="background-color: var(--text-muted); color: white; margin-right: 10px; padding: 10px 15px; text-decoration: none; border-radius: 4px;">Cancelar</a>
                     <button type="submit" class="btn btn-primary" style="padding: 10px 30px;">Guardar Cambios</button>
                 </div>
             </form>

@@ -20,12 +20,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ubicacion = trim($_POST['ubicacion'] ?? '');
     $observaciones = trim($_POST['observaciones'] ?? '');
 
+    // NUEVOS CAMPOS DE DEPRECIACIÓN
+    $costo_inicial = trim($_POST['costo_inicial'] ?? 0);
+    $fecha_adquisicion = trim($_POST['fecha_adquisicion'] ?? date('Y-m-d'));
+    $tasa_depreciacion = trim($_POST['tasa_depreciacion'] ?? 0.05);
+
     if (!$serie || !$modelo) {
         $err = 'Serie y Modelo son obligatorios.';
     } else {
-        // Insertar en la base de datos
-        $stmt = $conn->prepare("INSERT INTO equipos (serie, modelo, usuario, departamento, ubicacion, observaciones) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssssss", $serie, $modelo, $usuario, $departamento, $ubicacion, $observaciones);
+        // Insertar en la base de datos (Actualizado con las nuevas columnas)
+        $stmt = $conn->prepare("INSERT INTO equipos (serie, modelo, usuario, departamento, ubicacion, observaciones, costo_inicial, fecha_adquisicion, tasa_depreciacion_mensual) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        
+        // 9 strings/decimales ("s")
+        $stmt->bind_param("sssssssss", $serie, $modelo, $usuario, $departamento, $ubicacion, $observaciones, $costo_inicial, $fecha_adquisicion, $tasa_depreciacion);
         
         try {
             $stmt->execute();
@@ -61,7 +68,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="../style.css">
     <meta charset="UTF-8" />
     <title>Agregar Equipo - VAULT</title>
-    <link rel="stylesheet" href="../style.css">
 </head>
 <body>
 
@@ -80,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <header class="vault-header">
             <h1>Gestión de Inventario</h1>
             <div class="user" style="font-weight: 600;">
-                Usuario: <?php echo htmlspecialchars($_SESSION['nombre']); ?> 
+                Usuario: <?php echo htmlspecialchars($_SESSION['nombre'] ?? 'Desconocido'); ?> 
                 <a href="/logout.php" class="btn btn-danger" style="margin-left: 15px; padding: 5px 15px; font-size: 14px;">Salir</a>
             </div>
         </header>
@@ -135,6 +141,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </select>
                     </div>
 
+                    <div class="vault-form-group">
+                        <label>Costo Inicial ($) <span style="color: var(--danger-red);">*</span></label>
+                        <input type="number" step="0.01" name="costo_inicial" class="vault-form-control" required placeholder="Ej: 1500.00">
+                    </div>
+
+                    <div class="vault-form-group">
+                        <label>Fecha de Adquisición <span style="color: var(--danger-red);">*</span></label>
+                        <input type="date" name="fecha_adquisicion" class="vault-form-control" required value="<?php echo date('Y-m-d'); ?>">
+                    </div>
+
+                    <div class="vault-form-group" style="grid-column: span 2;">
+                        <label>Tasa de Depreciación Mensual</label>
+                        <input type="number" step="0.01" name="tasa_depreciacion" class="vault-form-control" required value="0.05">
+                        <small style="color: #6c757d; font-size: 12px; margin-top: 5px; display: block;">El valor 0.05 equivale al 5% mensual. Solo modifícalo si este equipo se deprecia a un ritmo distinto.</small>
+                    </div>
+
                     <div class="vault-form-group" style="grid-column: span 2;">
                         <label>Ubicación Física</label>
                         <select name="ubicacion" class="vault-form-control">
@@ -165,7 +187,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div style="margin-top: 30px; text-align: right; border-top: 1px solid var(--border-color); padding-top: 20px;">
-                    <a href="dashboard.php" class="btn" style="background-color: var(--text-muted); color: white; margin-right: 10px;">Cancelar</a>
+                    <a href="dashboard.php" class="btn" style="background-color: var(--text-muted); color: white; margin-right: 10px; padding: 10px 15px; text-decoration: none; border-radius: 4px;">Cancelar</a>
                     <button type="submit" class="btn btn-primary" style="padding: 10px 30px;">Guardar Equipo</button>
                 </div>
             </form>
@@ -175,5 +197,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 </body>
 </html>
-
 

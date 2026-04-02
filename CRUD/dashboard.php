@@ -12,7 +12,8 @@ $results = [];
 
 if ($q !== '') {
     $like = "%{$q}%";
-    $sql = "SELECT id, serie, modelo, usuario, departamento, ubicacion FROM equipos WHERE id LIKE ? OR serie LIKE ? OR modelo LIKE ? OR usuario LIKE ? OR departamento LIKE ? OR ubicacion LIKE ? ORDER BY id DESC";
+    // Se agregaron los campos de depreciación al SELECT
+    $sql = "SELECT id, serie, modelo, usuario, departamento, ubicacion, costo_inicial, fecha_adquisicion, tasa_depreciacion_mensual FROM equipos WHERE id LIKE ? OR serie LIKE ? OR modelo LIKE ? OR usuario LIKE ? OR departamento LIKE ? OR ubicacion LIKE ? ORDER BY id DESC";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('ssssss', $like, $like, $like, $like, $like, $like);
     $stmt->execute();
@@ -20,7 +21,8 @@ if ($q !== '') {
     $results = $res->fetch_all(MYSQLI_ASSOC);
     $stmt->close();
 } else {
-    $res = $conn->query("SELECT id, serie, modelo, usuario, departamento, ubicacion FROM equipos ORDER BY id DESC");
+    // Se agregaron los campos de depreciación al SELECT
+    $res = $conn->query("SELECT id, serie, modelo, usuario, departamento, ubicacion, costo_inicial, fecha_adquisicion, tasa_depreciacion_mensual FROM equipos ORDER BY id DESC");
     if ($res) {
         $results = $res->fetch_all(MYSQLI_ASSOC);
     }
@@ -51,7 +53,7 @@ if ($q !== '') {
         <header class="vault-header">
             <h1>Panel de Control</h1>
             <div class="user" style="font-weight: 600;">
-                Usuario: <?php echo htmlspecialchars($_SESSION['nombre']); ?> 
+                Usuario: <?php echo htmlspecialchars($_SESSION['nombre'] ?? 'Desconocido'); ?> 
                 <a href="/logout.php" class="btn btn-danger" style="margin-left: 15px; padding: 5px 15px; font-size: 14px;">Salir</a>
             </div>
         </header>
@@ -75,16 +77,37 @@ if ($q !== '') {
                         <th>Usuario</th>
                         <th>Departamento</th>
                         <th>Ubicación</th>
-                        <th style="text-align: center;">Acciones</th>
+                        <th>Costo</th> <th>Valor Actual</th> <th style="text-align: center;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (count($results) === 0): ?>
                     <tr>
-                        <td colspan="7" style="text-align: center; padding: 30px; color: var(--text-muted);">No se encontraron registros.</td>
+                        <td colspan="9" style="text-align: center; padding: 30px; color: var(--text-muted);">No se encontraron registros.</td>
                     </tr>
                     <?php else: ?>
-                    <?php foreach ($results as $r): ?>
+                    <?php 
+                        $fechaHoy = new DateTime(); // Tomamos la fecha actual una sola vez fuera del ciclo
+                        foreach ($results as $r): 
+                            
+                            // LÓGICA DE DEPRECIACIÓN
+                            $costoInicial = isset($r['costo_inicial']) ? (float)$r['costo_inicial'] : 0;
+                            $tasa = isset($r['tasa_depreciacion_mensual']) ? (float)$r['tasa_depreciacion_mensual'] : 0.05;
+                            
+                            // Prevenir errores si hay equipos antiguos sin fecha
+                            $fechaAdquisicion = !empty($r['fecha_adquisicion']) ? new DateTime($r['fecha_adquisicion']) : $fechaHoy;
+                            
+                            $diferencia = $fechaHoy->diff($fechaAdquisicion);
+                            $mesesTranscurridos = ($diferencia->y * 12) + $diferencia->m;
+
+                            $depreciacionTotal = $costoInicial * $tasa * $mesesTranscurridos;
+                            $valorActual = $costoInicial - $depreciacionTotal;
+                            
+                            // Evitar que el valor quede en negativo
+                            if ($valorActual < 0) {
+                                $valorActual = 0;
+                            }
+                    ?>
                     <tr>
                         <td><?php echo (int)$r['id']; ?></td>
                         <td><?php echo htmlspecialchars($r['serie']); ?></td>
@@ -92,6 +115,10 @@ if ($q !== '') {
                         <td><?php echo htmlspecialchars($r['usuario']); ?></td>
                         <td><?php echo htmlspecialchars($r['departamento']); ?></td>
                         <td><?php echo htmlspecialchars($r['ubicacion']); ?></td>
+                        
+                        <td style="color: #27ae60; font-weight: 600;">$<?php echo number_format($costoInicial, 2); ?></td>
+                        <td style="color: #e74c3c; font-weight: 600;">$<?php echo number_format($valorActual, 2); ?></td>
+
                         <td style="text-align: center; white-space: nowrap;">
                             <a href="edit_equipo.php?id=<?php echo (int)$r['id']; ?>" class="btn btn-primary" style="padding: 5px 10px; font-size: 12px; margin-right: 5px;">Editar</a>
                             <a href="mover.php?id=<?php echo (int)$r['id']; ?>" class="btn btn-primary" style="padding: 5px 10px; font-size: 12px; margin-right: 5px; background-color: #17a2b8;">Mover</a>
