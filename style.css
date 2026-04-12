@@ -72,6 +72,7 @@ body {
     flex: 1;
     padding: 30px;
     overflow-y: auto;
+    min-width: 0;
 }
 
 .vault-header {
@@ -194,3 +195,39 @@ body {
     max-width: 150px;
     opacity: 0.7;
 }
+
+/* --- Responsividad --- */
+@media (max-width: 768px) {
+    .vault-container {
+        flex-direction: column;
+    }
+    .vault-sidebar {
+        width: 100%;
+        padding: 10px 0;
+    }
+    .vault-sidebar ul {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .vault-sidebar ul li {
+        margin: 5px;
+    }
+    .vault-sidebar ul li a {
+        padding: 10px 15px;
+        text-align: center;
+        border-radius: 5px;
+        border-left: none;
+    }
+    .vault-sidebar ul li a:hover {
+        border-left: none;
+    }
+    .vault-main {
+        padding: 15px;
+    }
+    .vault-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+}

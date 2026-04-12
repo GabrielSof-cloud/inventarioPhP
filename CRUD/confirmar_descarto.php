@@ -3,7 +3,7 @@ session_start();
 require_once __DIR__ . '/../DBconn/conexion.php';
 
 if (empty($_SESSION['user_id'])) {
-    header('Location: /Loging.php');
+    header('Location: ../Login.php');
     exit;
 }
 
@@ -93,8 +93,8 @@ if (!$equipo) {
         <ul>
             <li><a href="dashboard.php">Dashboard</a></li>
             <li><a href="create_form.php">Agregar Equipo</a></li>
-            <li><a href="Descartado.php">Descartados</a></li>
-            <li><a href="movidos.php">Trazabilidad</a></li>
+            <li><a href="Descartado.php">Descarto</a></li>
+            <li><a href="movidos.php">Trazado</a></li>
         </ul>
     </aside>
 
@@ -103,7 +103,7 @@ if (!$equipo) {
             <h1>Confirmar Descarte</h1>
             <div class="user" style="font-weight: 600;">
                 Usuario: <?php echo htmlspecialchars($_SESSION['nombre']); ?> 
-                <a href="/logout.php" class="btn btn-danger" style="margin-left: 15px; padding: 5px 15px; font-size: 14px;">Salir</a>
+                <a href="../logout.php" class="btn btn-danger" style="margin-left: 15px; padding: 5px 15px; font-size: 14px;">Salir</a>
             </div>
         </header>
 

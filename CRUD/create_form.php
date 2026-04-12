@@ -4,7 +4,7 @@ require_once __DIR__ . '/../DBconn/conexion.php';
 require_once __DIR__ . '/../qrcodes/qr.php';
 
 if (empty($_SESSION['user_id'])) {
-    header('Location: /Loging.php');
+    header('Location: ../Login.php');
     exit;
 }
 
@@ -14,6 +14,7 @@ $msg = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validar y sanitizar inputs
     $serie = trim($_POST['serie'] ?? '');
+    $registro_bn = trim($_POST['registro_bn'] ?? '');
     $modelo = trim($_POST['modelo'] ?? '');
     $usuario = trim($_POST['usuario'] ?? '');
     $departamento = trim($_POST['departamento'] ?? '');
@@ -29,10 +30,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $err = 'Serie y Modelo son obligatorios.';
     } else {
         // Insertar en la base de datos (Actualizado con las nuevas columnas)
-        $stmt = $conn->prepare("INSERT INTO equipos (serie, modelo, usuario, departamento, ubicacion, observaciones, costo_inicial, fecha_adquisicion, tasa_depreciacion_mensual) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO equipos (serie, registro_bn, modelo, usuario, departamento, ubicacion, observaciones, costo_inicial, fecha_adquisicion, tasa_depreciacion_mensual) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         
-        // 9 strings/decimales ("s")
-        $stmt->bind_param("sssssssss", $serie, $modelo, $usuario, $departamento, $ubicacion, $observaciones, $costo_inicial, $fecha_adquisicion, $tasa_depreciacion);
+        // 10 strings/decimales ("s")
+        $stmt->bind_param("ssssssssss", $serie, $registro_bn, $modelo, $usuario, $departamento, $ubicacion, $observaciones, $costo_inicial, $fecha_adquisicion, $tasa_depreciacion);
         
         try {
             $stmt->execute();
@@ -77,8 +78,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <ul>
             <li><a href="dashboard.php">Dashboard</a></li>
             <li><a href="create_form.php">Agregar Equipo</a></li>
-            <li><a href="Descartado.php">Descartados</a></li>
-            <li><a href="movidos.php">Trazabilidad</a></li>
+            <li><a href="Descartado.php">Descarto</a></li>
+            <li><a href="movidos.php">Trazado</a></li>
         </ul>
     </aside>
 
@@ -87,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <h1>Gestión de Inventario</h1>
             <div class="user" style="font-weight: 600;">
                 Usuario: <?php echo htmlspecialchars($_SESSION['nombre'] ?? 'Desconocido'); ?> 
-                <a href="/logout.php" class="btn btn-danger" style="margin-left: 15px; padding: 5px 15px; font-size: 14px;">Salir</a>
+                <a href="../logout.php" class="btn btn-danger" style="margin-left: 15px; padding: 5px 15px; font-size: 14px;">Salir</a>
             </div>
         </header>
 
@@ -111,6 +112,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="vault-form-group">
                         <label>Serie <span style="color: var(--danger-red);">*</span></label>
                         <input type="text" name="serie" class="vault-form-control" required placeholder="Ej: SN-12345678">
+                    </div>
+                    
+                    <div class="vault-form-group">
+                        <label style="color: #0d47a1; font-weight: bold;">Reg. Bienes Nacionales</label>
+                        <input type="text" name="registro_bn" class="vault-form-control" placeholder="Ej: 1143764 (Opcional)">
                     </div>
                     
                     <div class="vault-form-group">

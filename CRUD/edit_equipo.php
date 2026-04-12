@@ -3,7 +3,7 @@ session_start();
 require_once __DIR__ . '/../DBconn/conexion.php';
 
 if (empty($_SESSION['user_id'])) {
-    header('Location: /Login.php');
+    header('Location: ../Login.php');
     exit;
 }
 
@@ -30,6 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $err = 'Petición inválida.';
     } else {
         $serie = htmlspecialchars(trim($_POST['serie'] ?? ''));
+        $registro_bn = htmlspecialchars(trim($_POST['registro_bn'] ?? ''));
         $modelo = htmlspecialchars(trim($_POST['modelo'] ?? ''));
         $usuario = htmlspecialchars(trim($_POST['usuario'] ?? ''));
         $departamento = htmlspecialchars(trim($_POST['departamento'] ?? ''));
@@ -46,14 +47,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             // Se agregaron los campos de depreciación al UPDATE
             $sql = "UPDATE equipos 
-                    SET serie=?, modelo=?, usuario=?, departamento=?, ubicacion=?, observaciones=?, costo_inicial=?, fecha_adquisicion=?, tasa_depreciacion_mensual=? 
+                    SET serie=?, registro_bn=?, modelo=?, usuario=?, departamento=?, ubicacion=?, observaciones=?, costo_inicial=?, fecha_adquisicion=?, tasa_depreciacion_mensual=? 
                     WHERE id=?";
 
             $stmt = $conn->prepare($sql);
-            // 9 strings/decimales ("s") y 1 entero ("i") para el ID
+            // 10 strings/decimales ("s") y 1 entero ("i") para el ID
             $stmt->bind_param(
-                "sssssssssi",
+                "ssssssssssi",
                 $serie,
+                $registro_bn,
                 $modelo,
                 $usuario,
                 $departamento,
@@ -104,8 +106,8 @@ if (!$equipo) {
         <ul>
             <li><a href="dashboard.php">Dashboard</a></li>
             <li><a href="create_form.php">Agregar Equipo</a></li>
-            <li><a href="Descartado.php">Descartados</a></li>
-            <li><a href="movidos.php">Trazabilidad</a></li>
+            <li><a href="Descartado.php">Descarto</a></li>
+            <li><a href="movidos.php">Trazado</a></li>
         </ul>
     </aside>
 
@@ -114,7 +116,7 @@ if (!$equipo) {
             <h1>Gestión de Inventario</h1>
             <div class="user" style="font-weight: 600;">
                 Usuario: <?php echo htmlspecialchars($_SESSION['nombre'] ?? 'Desconocido'); ?> 
-                <a href="/logout.php" class="btn btn-danger" style="margin-left: 15px; padding: 5px 15px; font-size: 14px;">Salir</a>
+                <a href="../logout.php" class="btn btn-danger" style="margin-left: 15px; padding: 5px 15px; font-size: 14px;">Salir</a>
             </div>
         </header>
 
@@ -141,6 +143,11 @@ if (!$equipo) {
                     <div class="vault-form-group">
                         <label>Serie <span style="color: var(--danger-red);">*</span></label>
                         <input type="text" name="serie" class="vault-form-control" value="<?php echo htmlspecialchars($equipo['serie']); ?>" required>
+                    </div>
+                    
+                    <div class="vault-form-group">
+                        <label style="color: #0d47a1; font-weight: bold;">Reg. Bienes Nacionales</label>
+                        <input type="text" name="registro_bn" class="vault-form-control" value="<?php echo htmlspecialchars($equipo['registro_bn'] ?? ''); ?>" placeholder="Ej: 1143764 (Opcional)">
                     </div>
                     
                     <div class="vault-form-group">

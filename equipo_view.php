@@ -3,7 +3,7 @@ session_start();
 require_once __DIR__ . '/DBconn/conexion.php';
 
 if (empty($_SESSION['user_id'])) {
-    header('Location: Loging.php');
+    header('Location: Login.php');
     exit;
 }
 
@@ -39,8 +39,8 @@ $qrPath = file_exists(__DIR__ . '/' . $rutaQR_rel) ? $rutaQR_rel : null;
         <ul>
             <li><a href="CRUD/dashboard.php">Dashboard</a></li>
             <li><a href="CRUD/create_form.php">Agregar Equipo</a></li>
-            <li><a href="CRUD/Descartado.php">Descartados</a></li>
-            <li><a href="CRUD/movidos.php">Trazabilidad</a></li>
+            <li><a href="CRUD/Descartado.php">Descarto</a></li>
+            <li><a href="CRUD/movidos.php">Trazado</a></li>
         </ul>
     </aside>
 
@@ -57,7 +57,12 @@ $qrPath = file_exists(__DIR__ . '/' . $rutaQR_rel) ? $rutaQR_rel : null;
             
             <div class="vault-card">
                 <div style="border-bottom: 2px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-                    <h2 style="color: var(--primary-blue); margin: 0;">Ficha Técnica: <?=htmlspecialchars($e['serie'])?></h2>
+                    <div>
+                        <h2 style="color: var(--primary-blue); margin: 0;">Ficha Técnica: <?=htmlspecialchars($e['serie'])?></h2>
+                        <?php if (!empty($e['registro_bn'])): ?>
+                            <span style="display: inline-block; margin-top: 5px; background-color: #0d47a1; color: white; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 12px;">✅ Bienes Nacionales: <?=htmlspecialchars($e['registro_bn'])?></span>
+                        <?php endif; ?>
+                    </div>
                     <span style="background-color: #e8f4fd; color: #004B87; padding: 5px 15px; border-radius: 20px; font-weight: 600; font-size: 14px;">ID: <?= $e['id'] ?></span>
                 </div>
 

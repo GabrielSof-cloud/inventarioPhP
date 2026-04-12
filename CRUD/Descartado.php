@@ -3,7 +3,7 @@ session_start();
 require_once __DIR__ . '/../DBconn/conexion.php';
 
 if (empty($_SESSION['user_id'])) {
-    header('Location: /Loging.php');
+    header('Location: ../Login.php');
     exit;
 }
 //Antes de continuar, los bloques de codigo comentados componen todo la funcion de
@@ -107,7 +107,7 @@ if ($q !== '') {
 <head>
     <link rel="stylesheet" href="../style.css">
     <meta charset="UTF-8" />
-    <title>Equipos Descartados - VAULT</title>
+    <title>Equipos en Descarto - VAULT</title>
     <link rel="stylesheet" href="../style.css">
 </head>
 <body>
@@ -118,24 +118,24 @@ if ($q !== '') {
         <ul>
             <li><a href="dashboard.php">Dashboard</a></li>
             <li><a href="create_form.php">Agregar Equipo</a></li>
-            <li><a href="Descartado.php">Descartados</a></li>
-            <li><a href="movidos.php">Trazabilidad</a></li>
+            <li><a href="Descartado.php">Descarto</a></li>
+            <li><a href="movidos.php">Trazado</a></li>
         </ul>
     </aside>
 
     <main class="vault-main">
         <header class="vault-header">
-            <h1>Equipos Descartados</h1>
+            <h1>Equipos en Descarto</h1>
             <div class="user" style="font-weight: 600;">
                 Usuario: <?php echo htmlspecialchars($_SESSION['nombre']); ?> 
-                <a href="/logout.php" class="btn btn-danger" style="margin-left: 15px; padding: 5px 15px; font-size: 14px;">Salir</a>
+                <a href="../logout.php" class="btn btn-danger" style="margin-left: 15px; padding: 5px 15px; font-size: 14px;">Salir</a>
             </div>
         </header>
 
         <div class="vault-card">
             <form method="get" action="Descartado.php" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                 <div style="flex: 1; min-width: 250px;">
-                    <input type="text" name="q" class="vault-form-control" placeholder="Buscar descartados por serie, modelo, motivo..." value="<?php echo htmlspecialchars($q); ?>">
+                    <input type="text" name="q" class="vault-form-control" placeholder="Buscar descartos por serie, modelo, motivo..." value="<?php echo htmlspecialchars($q); ?>">
                 </div>
                 <button type="submit" class="btn btn-primary">Buscar</button>
                 <a href="dashboard.php" class="btn" style="background-color: var(--text-muted); color: white;">Volver al Dashboard</a>
@@ -160,7 +160,7 @@ if ($q !== '') {
                 <tbody>
                     <?php if (count($results) === 0): ?>
                     <tr>
-                        <td colspan="10" style="text-align: center; padding: 30px; color: var(--text-muted);">No hay equipos descartados.</td>
+                        <td colspan="10" style="text-align: center; padding: 30px; color: var(--text-muted);">No hay equipos en descarto.</td>
                     </tr>
                     <?php else: ?>
                     <?php foreach ($results as $r): ?>

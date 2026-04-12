@@ -3,7 +3,7 @@ session_start();
 require_once __DIR__ . '/../DBconn/conexion.php';
 
 if (empty($_SESSION['user_id'])) {
-    header('Location: /Login.php');
+    header('Location: ../Login.php');
     exit;
 }
 
@@ -13,16 +13,16 @@ $results = [];
 if ($q !== '') {
     $like = "%{$q}%";
     // Se agregaron los campos de depreciación al SELECT
-    $sql = "SELECT id, serie, modelo, usuario, departamento, ubicacion, costo_inicial, fecha_adquisicion, tasa_depreciacion_mensual FROM equipos WHERE id LIKE ? OR serie LIKE ? OR modelo LIKE ? OR usuario LIKE ? OR departamento LIKE ? OR ubicacion LIKE ? ORDER BY id DESC";
+    $sql = "SELECT id, serie, registro_bn, modelo, usuario, departamento, ubicacion, costo_inicial, fecha_adquisicion, tasa_depreciacion_mensual FROM equipos WHERE id LIKE ? OR serie LIKE ? OR registro_bn LIKE ? OR modelo LIKE ? OR usuario LIKE ? OR departamento LIKE ? OR ubicacion LIKE ? ORDER BY id DESC";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('ssssss', $like, $like, $like, $like, $like, $like);
+    $stmt->bind_param('sssssss', $like, $like, $like, $like, $like, $like, $like);
     $stmt->execute();
     $res = $stmt->get_result();
     $results = $res->fetch_all(MYSQLI_ASSOC);
     $stmt->close();
 } else {
     // Se agregaron los campos de depreciación al SELECT
-    $res = $conn->query("SELECT id, serie, modelo, usuario, departamento, ubicacion, costo_inicial, fecha_adquisicion, tasa_depreciacion_mensual FROM equipos ORDER BY id DESC");
+    $res = $conn->query("SELECT id, serie, registro_bn, modelo, usuario, departamento, ubicacion, costo_inicial, fecha_adquisicion, tasa_depreciacion_mensual FROM equipos ORDER BY id DESC");
     if ($res) {
         $results = $res->fetch_all(MYSQLI_ASSOC);
     }
@@ -44,8 +44,8 @@ if ($q !== '') {
         <ul>
             <li><a href="dashboard.php">Dashboard</a></li>
             <li><a href="create_form.php">Agregar Equipo</a></li>
-            <li><a href="Descartado.php">Descartados</a></li>
-            <li><a href="movidos.php">Trazabilidad</a></li>
+            <li><a href="Descartado.php">Descarto</a></li>
+            <li><a href="movidos.php">Trazado</a></li>
         </ul>
     </aside>
 
@@ -54,7 +54,7 @@ if ($q !== '') {
             <h1>Panel de Control</h1>
             <div class="user" style="font-weight: 600;">
                 Usuario: <?php echo htmlspecialchars($_SESSION['nombre'] ?? 'Desconocido'); ?> 
-                <a href="/logout.php" class="btn btn-danger" style="margin-left: 15px; padding: 5px 15px; font-size: 14px;">Salir</a>
+                <a href="../logout.php" class="btn btn-danger" style="margin-left: 15px; padding: 5px 15px; font-size: 14px;">Salir</a>
             </div>
         </header>
 
@@ -67,12 +67,13 @@ if ($q !== '') {
             </form>
         </div>
 
-        <div class="vault-card" style="padding: 0; overflow: hidden;">
+        <div class="vault-card" style="padding: 0; overflow-x: auto;">
             <table class="vault-table">
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Serie</th>
+                        <th>Bienes Nacionales</th>
                         <th>Modelo</th>
                         <th>Usuario</th>
                         <th>Departamento</th>
@@ -111,6 +112,13 @@ if ($q !== '') {
                     <tr>
                         <td><?php echo (int)$r['id']; ?></td>
                         <td><?php echo htmlspecialchars($r['serie']); ?></td>
+                        <td>
+                            <?php if(!empty($r['registro_bn'])): ?>
+                                <span style="background-color: #0d47a1; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold;">BN-<?php echo htmlspecialchars($r['registro_bn']); ?></span>
+                            <?php else: ?>
+                                <span style="color: #ccc;">N/A</span>
+                            <?php endif; ?>
+                        </td>
                         <td><?php echo htmlspecialchars($r['modelo']); ?></td>
                         <td><?php echo htmlspecialchars($r['usuario']); ?></td>
                         <td><?php echo htmlspecialchars($r['departamento']); ?></td>

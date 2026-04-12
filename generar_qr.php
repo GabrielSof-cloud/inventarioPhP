@@ -4,7 +4,7 @@ require_once __DIR__ . '/DBconn/conexion.php';
 require_once __DIR__ . '/qrcodes/qr.php';
 
 if (empty($_SESSION['user_id'])) {
-    header('Location: Loging.php');
+    header('Location: Login.php');
     exit;
 }
 

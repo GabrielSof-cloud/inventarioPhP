@@ -134,6 +134,9 @@ if (!$e) {
             <div class="info-value" style="font-size: 18px; color: var(--accent-blue);">
                 <?= htmlspecialchars($e['serie']) ?>
                 <div class="badge">ID: <?= $e['id'] ?></div>
+                <?php if (!empty($e['registro_bn'])): ?>
+                    <br><div class="badge" style="background-color: #0d47a1; color: white; margin-top: 5px;">BN-<?= htmlspecialchars($e['registro_bn']) ?></div>
+                <?php endif; ?>
             </div>
         </div>
 
