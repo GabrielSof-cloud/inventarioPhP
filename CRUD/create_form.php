@@ -16,24 +16,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $serie = trim($_POST['serie'] ?? '');
     $registro_bn = trim($_POST['registro_bn'] ?? '');
     $modelo = trim($_POST['modelo'] ?? '');
+    $categoria = trim($_POST['categoria'] ?? ''); // NUEVO
     $usuario = trim($_POST['usuario'] ?? '');
     $departamento = trim($_POST['departamento'] ?? '');
     $ubicacion = trim($_POST['ubicacion'] ?? '');
     $observaciones = trim($_POST['observaciones'] ?? '');
 
-    // NUEVOS CAMPOS DE DEPRECIACIÓN
+    // CAMPOS DE DEPRECIACIÓN
     $costo_inicial = trim($_POST['costo_inicial'] ?? 0);
     $fecha_adquisicion = trim($_POST['fecha_adquisicion'] ?? date('Y-m-d'));
     $tasa_depreciacion = trim($_POST['tasa_depreciacion'] ?? 0.05);
+    $vida_util_meses = (int)($_POST['vida_util_meses'] ?? 60); // NUEVO
 
-    if (!$serie || !$modelo) {
-        $err = 'Serie y Modelo son obligatorios.';
+    if (!$serie || !$modelo || !$categoria) {
+        $err = 'Serie, Modelo y Categoría son obligatorios.';
     } else {
-        // Insertar en la base de datos (Actualizado con las nuevas columnas)
-        $stmt = $conn->prepare("INSERT INTO equipos (serie, registro_bn, modelo, usuario, departamento, ubicacion, observaciones, costo_inicial, fecha_adquisicion, tasa_depreciacion_mensual) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        // Insertar en la base de datos con las 12 columnas actualizadas
+        $stmt = $conn->prepare("INSERT INTO equipos (serie, registro_bn, modelo, categoria, usuario, departamento, ubicacion, observaciones, costo_inicial, fecha_adquisicion, tasa_depreciacion_mensual, vida_util_meses) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         
-        // 10 strings/decimales ("s")
-        $stmt->bind_param("ssssssssss", $serie, $registro_bn, $modelo, $usuario, $departamento, $ubicacion, $observaciones, $costo_inicial, $fecha_adquisicion, $tasa_depreciacion);
+        // 11 strings/decimales ("s") y 1 entero ("i") para los meses
+        $stmt->bind_param("sssssssssssi", $serie, $registro_bn, $modelo, $categoria, $usuario, $departamento, $ubicacion, $observaciones, $costo_inicial, $fecha_adquisicion, $tasa_depreciacion, $vida_util_meses);
         
         try {
             $stmt->execute();
@@ -69,6 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="../style.css">
     <meta charset="UTF-8" />
     <title>Agregar Equipo - VAULT</title>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
 
@@ -77,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h2>VAULT</h2>
         <ul>
             <li><a href="dashboard.php">Dashboard</a></li>
-            <li><a href="create_form.php">Agregar Equipo</a></li>
+            <li><a href="por_departamento.php">Inventario por Depto</a></li> <li><a href="create_form.php">Agregar Equipo</a></li>
             <li><a href="Descartado.php">Descarto</a></li>
             <li><a href="movidos.php">Trazado</a></li>
         </ul>
@@ -116,12 +119,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     
                     <div class="vault-form-group">
                         <label style="color: #0d47a1; font-weight: bold;">Reg. Bienes Nacionales</label>
-                        <input type="text" name="registro_bn" class="vault-form-control" placeholder="Ej: 1143764 (Opcional)">
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="text" name="registro_bn" id="registro_bn" class="vault-form-control" placeholder="Ej: 1143764" style="flex: 1;">
+                            <input type="file" id="scan_input" accept="image/*" capture="environment" style="display: none;">
+                            <button type="button" class="btn btn-primary" id="btn_scan" style="padding: 10px; background-color: #2980b9;">📷</button>
+                        </div>
+                        <small id="scan_status" style="color: #e67e22; font-weight: bold; display: none; margin-top: 5px;">Analizando imagen...</small>
                     </div>
                     
                     <div class="vault-form-group">
                         <label>Modelo <span style="color: var(--danger-red);">*</span></label>
                         <input type="text" name="modelo" class="vault-form-control" required placeholder="Ej: Dell Optiplex 3080">
+                    </div>
+
+                    <div class="vault-form-group">
+                        <label>Categoría <span style="color: var(--danger-red);">*</span></label>
+                        <select name="categoria" id="categoria_select" class="vault-form-control" required>
+                            <option value="">Seleccione una categoría...</option>
+                            <option value="Mobiliarios de Oficina">Mobiliarios de Oficina</option>
+                            <option value="Equipos Informáticos">Equipos Informáticos</option>
+                            <option value="Maquinaria o Equipos Pesados">Maquinaria o Equipos Pesados</option>
+                            <option value="Vehiculos">Vehículos</option>
+                            <option value="Edificaciones">Edificaciones</option>
+                        </select>
                     </div>
 
                     <div class="vault-form-group">
@@ -157,10 +177,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <input type="date" name="fecha_adquisicion" class="vault-form-control" required value="<?php echo date('Y-m-d'); ?>">
                     </div>
 
-                    <div class="vault-form-group" style="grid-column: span 2;">
-                        <label>Tasa de Depreciación Mensual</label>
+                    <div class="vault-form-group">
+                        <label>Vida Útil (Meses) <span style="color: var(--danger-red);">*</span></label>
+                        <input type="number" id="vida_util_input" name="vida_util_meses" class="vault-form-control" required value="60">
+                        <small style="color: #6c757d; font-size: 12px; display: block; margin-top: 5px;">Se autocompleta según la categoría elegida.</small>
+                    </div>
+
+                    <div class="vault-form-group">
+                        <label>Tasa de Deprec. Mensual</label>
                         <input type="number" step="0.01" name="tasa_depreciacion" class="vault-form-control" required value="0.05">
-                        <small style="color: #6c757d; font-size: 12px; margin-top: 5px; display: block;">El valor 0.05 equivale al 5% mensual. Solo modifícalo si este equipo se deprecia a un ritmo distinto.</small>
                     </div>
 
                     <div class="vault-form-group" style="grid-column: span 2;">
@@ -200,6 +225,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </main>
 </div>
+
+<script>
+    // 1. AUTO ASIGNAR VIDA ÚTIL SEGÚN LA CATEGORÍA
+    document.getElementById('categoria_select').addEventListener('change', function() {
+        let meses = 60; // Valor por defecto
+        switch(this.value) {
+            case 'Equipos Informáticos': meses = 48; break; // 4 años
+            case 'Vehiculos': meses = 60; break; // 5 años
+            case 'Mobiliarios de Oficina': meses = 120; break; // 10 años
+            case 'Maquinaria o Equipos Pesados': meses = 120; break; // 10 años
+            case 'Edificaciones': meses = 240; break; // 20 años
+        }
+        document.getElementById('vida_util_input').value = meses;
+    });
+
+    // 2. LÓGICA DE ESCANEO OCR PARA BIENES NACIONALES
+    document.getElementById('btn_scan').addEventListener('click', function() {
+        document.getElementById('scan_input').click();
+    });
+
+    document.getElementById('scan_input').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const statusText = document.getElementById('scan_status');
+        const inputRegistro = document.getElementById('registro_bn');
+        
+        statusText.style.display = 'block';
+        statusText.innerText = 'Analizando imagen... esto puede tardar unos segundos.';
+
+        Tesseract.recognize(
+            file,
+            'eng+spa'
+        ).then(({ data: { text } }) => {
+            const regex = /\b\d{6,8}\b/g;
+            const coincidencias = text.match(regex);
+
+            if (coincidencias && coincidencias.length > 0) {
+                inputRegistro.value = coincidencias[0];
+                statusText.style.color = '#27ae60';
+                statusText.innerText = '¡Etiqueta reconocida con éxito!';
+            } else {
+                statusText.style.color = '#e74c3c';
+                statusText.innerText = 'No se encontró el número. Intenta tomar la foto más cerca.';
+            }
+            
+            setTimeout(() => { statusText.style.display = 'none'; }, 5000);
+        }).catch(err => {
+            statusText.style.color = '#e74c3c';
+            statusText.innerText = 'Error al leer la imagen.';
+            console.error(err);
+        });
+    });
+</script>
 
 </body>
 </html>
