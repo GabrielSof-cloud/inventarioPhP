@@ -109,16 +109,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     margin-bottom: 10px;
   }
   .footer {
-    margin-top: 15px;
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    font-size: 13px;
+    color: #7f8c8d;
+    line-height: 1.5;
   }
-  .footer span {
+  .footer strong {
+    color: #2c3e50;
     display: block;
-    margin-bottom: 10px;
-  }
-  .footer a {
-    color: #007BFF;
-    text-decoration: none;
-    font-weight: bold;
+    margin-bottom: 5px;
   }
 </style>
 </head>
@@ -133,8 +134,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
     <button type="submit">Ingresar</button>
   </form>
+  
   <div class="footer">
-    <span>¿No tienes cuenta? <a href="Registrar.php">Crear cuenta</a></span>
+    <strong>Solo para Uso Interno.</strong>
+    Si desea acceder favor comunicarse con el Auditor o Contable Autorizado.
   </div>
 </div>
 </body>
